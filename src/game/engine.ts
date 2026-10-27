@@ -1,3 +1,10 @@
+import {
+  freshCareer,
+  currentCareer,
+  ledger,
+  progressTick,
+  type Career,
+} from "./career";
 import { companies, events } from "./data";
 export type Asset = (typeof companies)[number] & {
   open: number;
@@ -11,7 +18,8 @@ export type News = {
   time: number;
 };
 export type Game = {
-  version: 1;
+  version: 2;
+  career: Career;
   cash: number;
   assets: Asset[];
   positions: Record<string, { quantity: number; average: number }>;
@@ -30,7 +38,8 @@ export const pct = (n: number) => (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
 const round = (n: number) => Math.round(n * 100) / 100;
 export function fresh(): Game {
   return {
-    version: 1,
+    version: 2,
+    career: freshCareer(),
     cash: 10000,
     assets: companies.map((a, j) => ({
       ...a,
@@ -127,6 +136,28 @@ export function trade(
     unlocked: [...new Set(unlocked)],
     cash: round(g.cash + (side === "buy" ? -total : total)),
     trades: g.trades + 1,
+    career: ledger(
+      {
+        ...currentCareer(g.career),
+        xp: g.career.xp + 5,
+        daily: {
+          ...currentCareer(g.career).daily,
+          trades: currentCareer(g.career).daily.trades + 1,
+          sells:
+            currentCareer(g.career).daily.sells + (side === "sell" ? 1 : 0),
+        },
+      },
+      {
+        kind: side,
+        symbol,
+        quantity,
+        amount: side === "buy" ? -total : total,
+        label:
+          side === "buy"
+            ? "Compra: esperança adquirida com sucesso"
+            : "Venda: desapego processado",
+      },
+    ),
   });
 }
 export function tick(
@@ -134,6 +165,7 @@ export function tick(
   rng = Math.random,
   eventIndex?: number,
   day = new Date().getDay(),
+  advanceClock = true,
 ): Game {
   const event = eventIndex === undefined ? undefined : events[eventIndex];
   const assets = g.assets.map((a) => {
@@ -151,8 +183,9 @@ export function tick(
       ? [{ ...event, time: Date.now() }, ...g.news].slice(0, 40)
       : g.news,
   };
+  const progressed = advanceClock ? progressTick(next) : next;
   return award({
-    ...next,
+    ...progressed,
     timeline: [
       ...g.timeline.slice(-59),
       {
@@ -160,7 +193,7 @@ export function tick(
           hour: "2-digit",
           minute: "2-digit",
         }),
-        value: wealth(next),
+        value: wealth(progressed),
       },
     ],
   });
@@ -172,14 +205,22 @@ export function loadGame(): Game {
     if (!raw) return fresh();
     const g = JSON.parse(raw);
     if (
-      g.version !== 1 ||
+      (g.version !== 1 && g.version !== 2) ||
       !Number.isFinite(g.cash) ||
       g.cash < 0 ||
       !Array.isArray(g.assets) ||
-      g.assets.length !== 8 ||
+      g.assets.length < 8 ||
+      g.assets.length > 11 ||
       !g.assets.every(
         (a: Asset, i: number) =>
-          a.symbol === companies[i].symbol &&
+          (i < 8
+            ? a.symbol === companies[i].symbol
+            : /^[A-Z]{3,5}[34]$/.test(a.symbol)) &&
+          [a.name, a.symbol, a.emoji, a.description, a.sector, a.color].every(
+            (v) => typeof v === "string",
+          ) &&
+          Number.isFinite(a.open) &&
+          a.open > 0 &&
           Number.isFinite(a.price) &&
           a.price > 0 &&
           Array.isArray(a.history) &&
@@ -200,7 +241,44 @@ export function loadGame(): Game {
       !Number.isFinite(g.realized)
     )
       return fresh();
-    return g;
+    const base = freshCareer();
+    const career = g.version === 2 ? g.career : base;
+    if (
+      !career ||
+      !Number.isFinite(career.xp) ||
+      career.xp < 0 ||
+      !Number.isSafeInteger(career.ticks) ||
+      !Number.isFinite(career.dividends) ||
+      !Number.isSafeInteger(career.lastDividendTick) ||
+      !Array.isArray(career.ledger) ||
+      !career.daily ||
+      !Array.isArray(career.daily.claimed) ||
+      !["trades", "sells", "chaos", "ipos"].every(
+        (k) => Number.isSafeInteger(career.daily[k]) && career.daily[k] >= 0,
+      ) ||
+      !career.profile ||
+      !["name", "avatar", "title", "office", "bio", "color"].every(
+        (k) => typeof career.profile[k] === "string",
+      ) ||
+      !/^#[0-9a-f]{6}$/i.test(career.profile.color) ||
+      career.ticks < 0 ||
+      career.lastDividendTick < 0 ||
+      career.lastDividendTick > career.ticks ||
+      career.dividends < 0 ||
+      !career.ledger.every(
+        (r: any) =>
+          r &&
+          typeof r.id === "string" &&
+          Number.isFinite(r.time) &&
+          ["buy", "sell", "dividend", "reward", "ipo"].includes(r.kind) &&
+          typeof r.label === "string" &&
+          typeof r.symbol === "string" &&
+          Number.isFinite(r.amount) &&
+          Number.isSafeInteger(r.quantity),
+      )
+    )
+      return fresh();
+    return { ...g, version: 2, career: currentCareer(career) };
   } catch {
     return fresh();
   }
