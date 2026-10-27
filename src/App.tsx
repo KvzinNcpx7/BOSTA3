@@ -24,6 +24,10 @@ import {
   Check,
   TrendingUp,
   TrendingDown,
+  IdCard,
+  Users,
+  BriefcaseBusiness,
+  ScrollText,
 } from "lucide-react";
 import { achievements, events } from "./game/data";
 import {
@@ -39,22 +43,41 @@ import {
   type Asset,
 } from "./game/engine";
 import { Chart } from "./components/Chart";
+import {
+  CareerPanel,
+  CompanyPanel,
+  HistoryPanel,
+} from "./components/CareerPanel";
+import { SocialPanel } from "./components/SocialPanel";
+import { currentCareer } from "./game/career";
 type Tab =
   | "Visão geral"
   | "Mercado"
   | "Minha carteira"
   | "Jornal do Caos"
-  | "Conquistas";
+  | "Conquistas"
+  | "Minha carreira"
+  | "IPO de Pote"
+  | "Clube do Boleto"
+  | "Extrato";
 const nav = [
   { name: "Visão geral" as Tab, icon: LayoutDashboard },
   { name: "Mercado" as Tab, icon: ChartNoAxesCombined },
   { name: "Minha carteira" as Tab, icon: Wallet },
   { name: "Jornal do Caos" as Tab, icon: Newspaper },
   { name: "Conquistas" as Tab, icon: Trophy },
+  { name: "Minha carreira" as Tab, icon: IdCard },
+  { name: "IPO de Pote" as Tab, icon: BriefcaseBusiness },
+  { name: "Clube do Boleto" as Tab, icon: Users },
+  { name: "Extrato" as Tab, icon: ScrollText },
 ];
 export default function App() {
   const [game, setGame] = useState(loadGame);
-  const [tab, setTab] = useState<Tab>("Visão geral");
+  const [tab, setTab] = useState<Tab>(
+    new URLSearchParams(window.location.search).has("clube")
+      ? "Clube do Boleto"
+      : "Visão geral",
+  );
   const [paused, setPaused] = useState(false);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -126,7 +149,19 @@ export default function App() {
   const notify = (text: string) => setToast(text);
   const chaos = () => {
     const i = Math.floor(Math.random() * events.length);
-    setGame((g) => tick(g, Math.random, i));
+    setGame((g) => {
+      const c = currentCareer(g.career);
+      return tick(
+        {
+          ...g,
+          career: { ...c, daily: { ...c.daily, chaos: c.daily.chaos + 1 } },
+        },
+        Math.random,
+        i,
+        new Date().getDay(),
+        false,
+      );
+    });
     notify(
       `⚡ ${events[i].symbol}: ${pct(events[i].impact * 100)} de impacto. O caos foi servido.`,
     );
@@ -173,7 +208,8 @@ export default function App() {
             B<span>↘</span>
           </span>
           <span>
-            BOSTA<span className="lime">3</span>
+            BOSTA
+            <span className="lime">3</span>
             <small>A BOLSA DOS MEMES</small>
           </span>
         </a>
@@ -214,14 +250,14 @@ export default function App() {
             <RotateCcw size={16} />
             Reiniciar minha carreira
           </button>
-          <div className="profile">
-            <div className="avatar">I</div>
+          <button className="profile" onClick={() => setTab("Minha carreira")}>
+            <div className="avatar">{game.career.profile.avatar}</div>
             <div>
-              <strong>Investidor anônimo</strong>
-              <small>Conta de mentirinha</small>
+              <strong>{game.career.profile.name}</strong>
+              <small>{game.career.profile.title}</small>
             </div>
             <span className="online-dot" />
-          </div>
+          </button>
         </div>
       </aside>
       <main>
@@ -287,7 +323,15 @@ export default function App() {
                       ? "Seu portfólio de decisões duvidosas."
                       : tab === "Jornal do Caos"
                         ? "Informação privilegiada de procedência duvidosa."
-                        : "Pequenas vitórias. Grandes questionamentos."}
+                        : tab === "Minha carreira"
+                          ? "Personalidade forte. Fundamentos fracos."
+                          : tab === "IPO de Pote"
+                            ? "Seu delírio merece um CNPJ imaginário."
+                            : tab === "Clube do Boleto"
+                              ? "O prejuízo é nosso. A zoeira é coletiva."
+                              : tab === "Extrato"
+                                ? "Toda péssima ideia deixa um recibo."
+                                : "Pequenas vitórias. Grandes questionamentos."}
               </h1>
               <p>
                 {tab === "Visão geral"
@@ -351,6 +395,24 @@ export default function App() {
                   {game.trades} operações · {game.unlocked.length} conquistas
                 </small>
               </div>
+            </section>
+          )}
+          {tab === "Visão geral" && (
+            <section className="v2-banner">
+              <span>🪪</span>
+              <div>
+                <strong>Seu novo emprego: CEO do caos.</strong>
+                <p>
+                  Missões diárias, dividendos e um documento que nenhum gerente
+                  vai aceitar.
+                </p>
+              </div>
+              <button
+                className="trade-button"
+                onClick={() => setTab("Minha carreira")}
+              >
+                Minha carreira <ArrowRight size={14} />
+              </button>
             </section>
           )}
           {tab === "Visão geral" && (
@@ -445,7 +507,9 @@ export default function App() {
                     {tab === "Mercado"
                       ? "Mercado de memes"
                       : "Ativos em alta (ou em surto)"}
-                    <span className="count-badge">8 ativos</span>
+                    <span className="count-badge">
+                      {game.assets.length} ativos
+                    </span>
                   </h2>
                   <p>
                     Empresas reais na nossa imaginação. Oportunidades igualmente
@@ -483,7 +547,7 @@ export default function App() {
                   </thead>
                   <tbody>
                     {filtered
-                      .slice(0, tab === "Visão geral" ? 5 : 8)
+                      .slice(0, tab === "Visão geral" ? 5 : game.assets.length)
                       .map((a) => (
                         <tr key={a.symbol}>
                           <td>
@@ -738,6 +802,16 @@ export default function App() {
               </div>
             </>
           )}
+          {tab === "Minha carreira" && (
+            <CareerPanel game={game} update={setGame} notify={notify} />
+          )}
+          {tab === "IPO de Pote" && (
+            <CompanyPanel game={game} update={setGame} notify={notify} />
+          )}
+          {tab === "Clube do Boleto" && (
+            <SocialPanel game={game} notify={notify} />
+          )}
+          {tab === "Extrato" && <HistoryPanel game={game} />}
           <footer>
             <span>
               <span className="brand-mini">B↘</span> BOSTA3 · A bolsa oficial
@@ -957,8 +1031,9 @@ export default function App() {
           >
             <h2 id="reset-title">Declarar falência emocional?</h2>
             <p>
-              Isso apaga sua carteira, histórico e conquistas neste navegador.
-              Você recomeça com R$ 10.000 fictícios.
+              Isso apaga sua carteira, perfil, empresas, missões, histórico e
+              conquistas neste navegador. O placar já publicado no clube não é
+              apagado. Você recomeça com R$ 10.000 fictícios.
             </p>
             <div className="reset-actions">
               <button className="trade-button" onClick={() => setReset(false)}>

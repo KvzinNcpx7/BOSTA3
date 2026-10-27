@@ -169,6 +169,46 @@ const headlines: [string, string, number][] = [
   ],
   ["ALL", "Banco Central do Caos eleva juros a 200% após café esfriar.", -0.07],
   ["ALL", "Mercado descobre que dinheiro é fictício e respira aliviado.", 0.06],
+  [
+    "CALV3",
+    "CALV3 lança assinatura de pente. Mercado pede perícia no público-alvo.",
+    -0.08,
+  ],
+  [
+    "CLT4",
+    "Empresa troca vale-refeição por palestra sobre abundância. Funcionários mastigam ressentimento.",
+    -0.12,
+  ],
+  [
+    "TIGR3",
+    "Diretoria contrata um polvo para gerir risco. Polvo pede demissão por falta de braços.",
+    -0.14,
+  ],
+  [
+    "FOFO3",
+    "Vizinha instala cadeira na calçada. Capacidade de análise fundamentalista triplica.",
+    0.15,
+  ],
+  [
+    "POMBO3",
+    "Pombo Airlines cobra bagagem de mão, de asa e de bico. Receita de taxas dispara.",
+    0.11,
+  ],
+  [
+    "WEBN3",
+    "Casal divide senha de streaming. Analistas anunciam fusão de alto risco.",
+    0.1,
+  ],
+  [
+    "SONO3",
+    "CEO participa da reunião dormindo e entrega o melhor resultado do trimestre.",
+    0.13,
+  ],
+  [
+    "BOLO4",
+    "Bolo de pote anuncia versão enterprise: o mesmo bolo, mas com reunião de onboarding.",
+    0.12,
+  ],
 ];
 export const events = headlines.map(([symbol, title, impact], id) => ({
   id,
