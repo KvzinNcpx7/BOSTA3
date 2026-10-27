@@ -1,0 +1,222 @@
+export const companies = [
+  {
+    symbol: "CALV3",
+    name: "Calvície Premium",
+    emoji: "👨‍🦲",
+    sector: "Estética & autoestima",
+    price: 34.9,
+    color: "#d5b88b",
+    description:
+      "A única empresa onde a queda é parte do crescimento. Líder em economia dos carecas.",
+  },
+  {
+    symbol: "CLT4",
+    name: "CLT Sofredora",
+    emoji: "💼",
+    sector: "Sobrevivência corporativa",
+    price: 12.45,
+    color: "#aaa4df",
+    description:
+      "Movida a café, boleto e um sonho distante de sexta-feira. Segunda tem desconto emocional.",
+  },
+  {
+    symbol: "TIGR3",
+    name: "Tigrinho Holdings",
+    emoji: "🐯",
+    sector: "Entretenimento duvidoso",
+    price: 6.66,
+    color: "#e7aa61",
+    description:
+      "O único balanço que ninguém consegue prever. Nem o próprio tigrinho.",
+  },
+  {
+    symbol: "FOFO3",
+    name: "Fofoca S.A.",
+    emoji: "🗣️",
+    sector: "Informação não verificada",
+    price: 28.7,
+    color: "#e5a9bf",
+    description:
+      "Transformamos “não conta pra ninguém” em resultados trimestrais.",
+  },
+  {
+    symbol: "POMBO3",
+    name: "Pombo Airlines",
+    emoji: "🐦",
+    sector: "Aviação & migalhas",
+    price: 18.2,
+    color: "#a7c4d0",
+    description:
+      "Seu voo pode atrasar. O cocô chega no horário. Administração 100% aviária.",
+  },
+  {
+    symbol: "WEBN3",
+    name: "Webnamoro Corporation",
+    emoji: "💔",
+    sector: "Relacionamentos a distância",
+    price: 9.8,
+    color: "#c79ae5",
+    description: "Ativos emocionais com alto risco de “precisamos conversar”.",
+  },
+  {
+    symbol: "SONO3",
+    name: "Dormir S.A.",
+    emoji: "😴",
+    sector: "Descanso estratégico",
+    price: 42.3,
+    color: "#9eabd9",
+    description: "Gerando valor enquanto você aperta soneca pela quinta vez.",
+  },
+  {
+    symbol: "BOLO4",
+    name: "Bolo de Pote Participações",
+    emoji: "🧁",
+    sector: "Empreendedorismo de pote",
+    price: 4.5,
+    color: "#d4bc85",
+    description:
+      "O primeiro unicórnio que cabe na geladeira. Próxima rodada: chocolate.",
+  },
+];
+const headlines: [string, string, number][] = [
+  [
+    "POMBO3",
+    "Pombo assume presidência da companhia após vencer votação por 3 migalhas.",
+    0.12,
+  ],
+  [
+    "CALV3",
+    "CEO é visto comprando shampoo. Investidores entram em pânico.",
+    -0.14,
+  ],
+  ["CLT4", "Pesquisa confirma: ninguém quer trabalhar segunda-feira.", -0.1],
+  [
+    "FOFO3",
+    "Print de grupo da firma vaza. Fofoca bate recorde de audiência.",
+    0.16,
+  ],
+  ["TIGR3", "Tigrinho anuncia que agora vai. Mercado acredita de novo.", 0.18],
+  [
+    "WEBN3",
+    "Casal volta pela oitava vez. Analistas chamam de recuperação em W.",
+    0.12,
+  ],
+  ["SONO3", "Professor cancela a primeira aula. País volta a sonhar.", 0.13],
+  ["BOLO4", "Bolo de pote recebe aporte de duas tias e um vizinho.", 0.14],
+  ["POMBO3", "Avião desvia rota ao avistar um pacote de biscoitos.", -0.09],
+  ["CALV3", "Boné vira item de luxo. Carecas celebram dividendos.", 0.11],
+  ["CLT4", "Reunião que poderia ser e-mail dura três horas.", -0.08],
+  ["FOFO3", "Áudio de sete minutos chega com “você não sabe da maior”.", 0.1],
+  ["TIGR3", "Mascote aperta o botão errado. Nem a auditoria entendeu.", -0.22],
+  ["WEBN3", "“Quem é essa pessoa curtindo sua foto?” abala o setor.", -0.16],
+  ["SONO3", "Vizinho compra furadeira. Mercado do descanso desaba.", -0.12],
+  [
+    "BOLO4",
+    "Colher vendida separadamente causa revolta entre acionistas.",
+    -0.08,
+  ],
+  ["POMBO3", "Nova classe executiva oferece migalhas integrais.", 0.08],
+  [
+    "CALV3",
+    "Estudo fictício: cabeça brilhante reduz conta de iluminação.",
+    0.13,
+  ],
+  [
+    "CLT4",
+    "Feriado cai na quinta. Ponte impulsiona felicidade nacional.",
+    0.15,
+  ],
+  [
+    "FOFO3",
+    "Fonte diz que fonte não é confiável. Mercado pede mais detalhes.",
+    -0.09,
+  ],
+  [
+    "TIGR3",
+    "Tigrinho troca diretor financeiro por um dado de vinte lados.",
+    -0.13,
+  ],
+  ["WEBN3", "Passagem de ônibus em promoção aproxima dois corações.", 0.14],
+  ["SONO3", "Chuva e cobertor formam joint venture histórica.", 0.11],
+  [
+    "BOLO4",
+    "Pote quadrado promete disrupção no setor de potes redondos.",
+    0.12,
+  ],
+  ["POMBO3", "CEO fica preso na varanda. Assembleia é adiada.", -0.12],
+  ["CALV3", "Vento forte derruba concorrência de perucas.", 0.09],
+  [
+    "CLT4",
+    "Firma anuncia pizza no lugar de aumento. Mercado digere mal.",
+    -0.11,
+  ],
+  ["FOFO3", "Grupo silenciado há um ano acumula 8 mil mensagens.", 0.08],
+  [
+    "TIGR3",
+    "Homem compra porque gráfico estava verde. Especialistas preocupados.",
+    0.07,
+  ],
+  [
+    "WEBN3",
+    "Wi-fi cai durante pedido de namoro. Romance entra em manutenção.",
+    -0.1,
+  ],
+  ["SONO3", "País aprova informalmente a sesta depois do almoço.", 0.12],
+  [
+    "BOLO4",
+    "CEO come estoque durante live. Previsão de receita revisada.",
+    -0.15,
+  ],
+  ["ALL", "Banco Central do Caos eleva juros a 200% após café esfriar.", -0.07],
+  ["ALL", "Mercado descobre que dinheiro é fictício e respira aliviado.", 0.06],
+];
+export const events = headlines.map(([symbol, title, impact], id) => ({
+  id,
+  symbol,
+  title,
+  impact,
+}));
+export const achievements = [
+  {
+    id: "first",
+    name: "Investidor de Centavos",
+    hint: "Faça sua primeira compra.",
+    emoji: "🪙",
+  },
+  {
+    id: "trader",
+    name: "Lobo de Wall Street de Osasco",
+    hint: "Realize 20 operações.",
+    emoji: "🐺",
+  },
+  {
+    id: "loss",
+    name: "Warren Buffett ao contrário",
+    hint: "Tenha prejuízo de R$ 500.",
+    emoji: "📉",
+  },
+  {
+    id: "ceo",
+    name: "CEO do Prejuízo",
+    hint: "Realize prejuízo acumulado de R$ 1.000.",
+    emoji: "💀",
+  },
+  {
+    id: "sellLoss",
+    name: "Comprou na Alta, Vendeu na Baixa",
+    hint: "Venda uma posição no prejuízo.",
+    emoji: "🤡",
+  },
+  {
+    id: "million",
+    name: "Milionário de Mentirinha",
+    hint: "Alcance R$ 1 milhão de patrimônio.",
+    emoji: "💸",
+  },
+  {
+    id: "snack",
+    name: "Patrimônio de um Salgado",
+    hint: "Fique com patrimônio de até R$ 10.",
+    emoji: "🥟",
+  },
+];
