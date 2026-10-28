@@ -3321,3 +3321,31 @@ footer > span {
     animation: none;
   }
 }
+
+/* Fictional financial parody, displayed only during the Painho special. */
+.special-painho {
+  border-color: #c38b5d;
+  background: radial-gradient(ellipse at right top, #c38b5d28, transparent), #211912;
+}
+.confisco-pegadinha {
+  margin-top: 12px;
+  border: 1px dashed #e4aa82;
+  padding: 12px 14px;
+  background: #00000045;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.confisco-pegadinha strong {
+  color: #ffd0aa;
+  font-size: clamp(13px, 1.8vw, 21px);
+}
+.confisco-pegadinha span {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #f5e3cd;
+}
+@media (prefers-reduced-motion: reduce) {
+  .special-painho .special-splash { animation: none; }
+}
