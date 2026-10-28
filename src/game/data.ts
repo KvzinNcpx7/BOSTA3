@@ -1,3 +1,4 @@
+import { newHeadlines, resenhaAchievements } from "./resenhaContent";
 export const companies = [
   {
     symbol: "CALV3",
@@ -210,13 +211,26 @@ const headlines: [string, string, number][] = [
     0.12,
   ],
 ];
-export const events = headlines.map(([symbol, title, impact], id) => ({
-  id,
-  symbol,
-  title,
-  impact,
-}));
-export const achievements = [
+export const events = [
+  ...headlines.map(([symbol, title, impact], id) => ({
+    id,
+    symbol,
+    title,
+    impact,
+    school: false,
+  })),
+  ...newHeadlines.map((event, index) => ({
+    ...event,
+    id: headlines.length + index,
+  })),
+];
+export const achievements: {
+  id: string;
+  name: string;
+  hint: string;
+  emoji: string;
+  school?: boolean;
+}[] = [
   {
     id: "first",
     name: "Investidor de Centavos",
@@ -259,4 +273,5 @@ export const achievements = [
     hint: "Fique com patrimônio de até R$ 10.",
     emoji: "🥟",
   },
+  ...resenhaAchievements,
 ];

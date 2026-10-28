@@ -1,3 +1,12 @@
+import { freshFun, restoreFun, observeFun, type FunState } from "./fun";
+import {
+  freshResenha,
+  restoreResenha,
+  activeSpecial,
+  tradeBlocked,
+  type ResenhaState,
+} from "./resenha";
+import type { SpecialKind } from "./resenhaContent";
 import {
   freshCareer,
   currentCareer,
@@ -16,9 +25,15 @@ export type News = {
   symbol: string;
   impact: number;
   time: number;
+  school?: boolean;
+  special?: SpecialKind;
+  impacts?: Record<string, number>;
+  report?: boolean;
 };
 export type Game = {
   version: 2;
+  resenha: ResenhaState;
+  fun: FunState;
   career: Career;
   cash: number;
   assets: Asset[];
@@ -39,6 +54,8 @@ const round = (n: number) => Math.round(n * 100) / 100;
 export function fresh(): Game {
   return {
     version: 2,
+    resenha: freshResenha(),
+    fun: freshFun(),
     career: freshCareer(),
     cash: 10000,
     assets: companies.map((a, j) => ({
@@ -80,6 +97,8 @@ export function wealth(g: Game) {
 }
 export function award(g: Game): Game {
   const w = wealth(g);
+  const r = g.resenha || freshResenha();
+  const lowestWealth = Math.min(r.lowestWealth, w);
   const checks: Record<string, boolean> = {
     first: g.trades > 0,
     trader: g.trades >= 20,
@@ -87,23 +106,44 @@ export function award(g: Game): Game {
     ceo: g.realized <= -1000,
     million: w >= 1000000,
     snack: w <= 10,
+    zapEconomist: r.sharedNews.length >= 3,
+    serasaPartner: g.realized <= -2500,
+    lossDegree: g.trades >= 50,
+    cltPremium: (g.positions.CLT4?.quantity || 0) >= 10,
+    erikaFriend: (r.specialCounts.erika || 0) > 0,
+    iarSurvivor: r.completed.includes("iararara"),
+    pigeonShareholder: (g.positions.POMBO3?.quantity || 0) >= 5,
+    coxinhaEntrepreneur:
+      (g.positions.BOLO4?.quantity || 0) >= 20 && g.career.dividends > 0,
+    topDoctor: r.topBuys >= 3,
+    billion: w >= 1000000000,
+    economicsRecovery: lowestWealth <= 9500 && w >= 10000 && g.trades > 0,
+    lossKing: r.lossSales >= 5 && g.realized <= -5000,
   };
-  return {
+  return observeFun({
     ...g,
+    resenha: { ...r, lowestWealth },
     unlocked: [
       ...new Set([
         ...g.unlocked,
         ...Object.keys(checks).filter((k) => checks[k]),
       ]),
     ],
-  };
+  });
 }
 export function trade(
   g: Game,
   symbol: string,
   side: "buy" | "sell",
   quantity: number,
+  now = Date.now(),
 ): Game {
+  if (tradeBlocked(g.resenha, now))
+    throw Error(
+      activeSpecial(g.resenha, now)?.kind === "iarPause"
+        ? "Pausa Iararara: o pregão volta em até 5 segundos. Nenhuma ordem foi debitada."
+        : "Greve CLT: ordens suspensas por alguns segundos. O vale-refeição ainda não caiu.",
+    );
   const a = g.assets.find((a) => a.symbol === symbol);
   if (!a || !Number.isSafeInteger(quantity) || quantity < 1)
     throw Error("Escolha uma quantidade inteira maior que zero.");
@@ -136,6 +176,14 @@ export function trade(
     unlocked: [...new Set(unlocked)],
     cash: round(g.cash + (side === "buy" ? -total : total)),
     trades: g.trades + 1,
+    resenha: {
+      ...g.resenha,
+      lossSales:
+        g.resenha.lossSales + (side === "sell" && a.price < p.average ? 1 : 0),
+      topBuys:
+        g.resenha.topBuys +
+        (side === "buy" && a.price >= Math.max(...a.history, a.price) ? 1 : 0),
+    },
     career: ledger(
       {
         ...currentCareer(g.career),
@@ -166,22 +214,51 @@ export function tick(
   eventIndex?: number,
   day = new Date().getDay(),
   advanceClock = true,
+  now = Date.now(),
 ): Game {
   const event = eventIndex === undefined ? undefined : events[eventIndex];
   const assets = g.assets.map((a) => {
-    let change = (rng() - 0.5) * (a.symbol === "TIGR3" ? 0.09 : 0.018);
+    const volatile =
+      activeSpecial(g.resenha, now)?.kind === "erika" && a.symbol === "FOFO3";
+    let change =
+      (rng() - 0.5) * (volatile ? 0.14 : a.symbol === "TIGR3" ? 0.09 : 0.018);
     if (day === 1 && a.symbol === "CLT4") change -= 0.0015;
     if (event && (event.symbol === a.symbol || event.symbol === "ALL"))
       change += event.impact;
     const price = Math.max(0.01, round(a.price * (1 + change)));
     return { ...a, price, history: [...a.history.slice(-59), price] };
   });
+  const latest: News[] = event ? [{ ...event, time: now }] : [];
+  const big = assets
+    .map((a, i) => ({ a, change: a.price / g.assets[i].price - 1 }))
+    .filter((x) => Math.abs(x.change) >= 0.12);
+  if (big.length) {
+    const movement = big.sort(
+      (a, b) => Math.abs(b.change) - Math.abs(a.change),
+    )[0];
+    latest.push({
+      id: -200,
+      title:
+        movement.change > 0
+          ? `🚀 ${movement.a.symbol} dispara ${pct(movement.change * 100)} na rodada. O grupo do zap já chama o resultado de método.`
+          : `📉 ${movement.a.symbol} recua ${pct(movement.change * 100)} na rodada. Comitê declara que o gráfico está procurando petróleo.`,
+      symbol: movement.a.symbol,
+      impact: movement.change,
+      school: event?.school || false,
+      report: true,
+      time: now,
+    });
+  }
   const next = {
     ...g,
     assets,
-    news: event
-      ? [{ ...event, time: Date.now() }, ...g.news].slice(0, 40)
-      : g.news,
+    resenha: event
+      ? {
+          ...g.resenha,
+          recentEvents: [...g.resenha.recentEvents, event.id].slice(-6),
+        }
+      : g.resenha,
+    news: latest.length ? [...latest, ...g.news].slice(0, 40) : g.news,
   };
   const progressed = advanceClock ? progressTick(next) : next;
   return award({
@@ -278,7 +355,13 @@ export function loadGame(): Game {
       )
     )
       return fresh();
-    return { ...g, version: 2, career: currentCareer(career) };
+    const migrated: Game = {
+      ...g,
+      version: 2,
+      career: currentCareer(career),
+      resenha: restoreResenha(g.resenha),
+    };
+    return { ...migrated, fun: restoreFun(g.fun, migrated) };
   } catch {
     return fresh();
   }
