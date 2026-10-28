@@ -31,7 +31,15 @@ export function triggerSpecial(
   const impacts: Record<string, number> = {};
   g.assets.forEach((a, i) => {
     impacts[a.symbol] =
-      kind === "irineu"
+      kind === "painho"
+        ? 0 // Fake on-screen confiscation only: NEVER change user balances, holdings or prices.
+        : kind === "taxad"
+        ? ({ CLT4: -0.08, BOLO4: -0.06, FOFO3: 0.07 } as Record<string, number>)[a.symbol] || 0
+        : kind === "vorcaro"
+        ? ({ TIGR3: 0.15, FOFO3: 0.09, BOLO4: -0.05 } as Record<string, number>)[a.symbol] || 0
+        : kind === "hipotetico"
+        ? (i % 2 === 0 ? 0.08 : -0.08)
+        : kind === "irineu"
         ? a.symbol === "FOFO3"
           ? 0.05
           : a.symbol === "TIGR3"
