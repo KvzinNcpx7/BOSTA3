@@ -1,6 +1,6 @@
 # Ligar o Clube do Boleto
 
-O site continua no GitHub Pages. O Supabase fornece login e banco para as ligas. Sem configuração, a interface explica que o clube ainda não abriu; o jogo local funciona normalmente.
+O site continua no GitHub Pages. O Supabase fornece login, banco para as ligas e saves privados entre aparelhos. Sem configuração, a interface explica que o clube ainda não abriu; o jogo local funciona normalmente.
 
 ## 1. Criar o projeto
 
@@ -14,7 +14,9 @@ O site continua no GitHub Pages. O Supabase fornece login e banco para as ligas.
 2. Copie o conteúdo completo de `supabase/migrations/001_clube_do_boleto.sql` deste repositório.
 3. Clique em **Run** uma vez. O arquivo cria tabelas, políticas de acesso e funções para criar/entrar em ligas e consultar ranking.
 
-O SQL é uma migração inicial: não execute novamente em um banco já configurado. Não desative RLS. Não use banco com outros projetos/tabelas de mesmo nome sem revisar a migração.
+Para ativar a carreira entre aparelhos, execute também `supabase/migrations/002_private_cloud_saves.sql` em uma nova consulta. Se as ligas já funcionam, execute **somente a 002**; não repita a 001.
+
+O SQL 001 é uma migração inicial: não execute novamente em um banco já configurado. Não desative RLS. Não use banco com outros projetos/tabelas de mesmo nome sem revisar a migração.
 
 ## 3. Configurar o login
 
@@ -50,7 +52,7 @@ Somente membros podem consultar o ranking de uma liga. Contas diferentes não po
 ## Limites desta etapa
 
 - O ranking é **recreativo e autodeclarado**. Dinheiro e operações continuam no navegador, que pode ser alterado pelo jogador. Não há premiação, competição financeira ou proteção contra trapaça nos resultados enviados. Uma competição verificada exige motor de jogo no servidor.
-- Login identifica o jogador no clube; **não sincroniza a carteira** nem o perfil local entre dispositivos.
+- Login identifica o jogador no clube e em Minha carreira. A carteira e o perfil podem ser sincronizados privadamente após instalar a migração 002 e ativar a nuvem.
 - Perfis enviados ao clube compartilham nome de pregão, avatar, cargo, patrimônio e XP somente nos rankings das ligas em comum. E-mail não aparece no ranking.
 - Empresas criadas pelo jogador ficam no mercado local. IPOs compartilhados, eventos globais e negociação multiplayer ainda exigem um mercado no servidor.
 - Reiniciar a carreira local não apaga o placar já publicado. Publique novamente para atualizá-lo. O dono pode remover uma conta e seus dados por **Supabase → Authentication → Users → Delete user**; tabelas usam exclusão em cascata.
@@ -63,3 +65,24 @@ O site agora aceita tanto o código quanto o link completo de convite no formul�
 O retorno do cadastro inclui a URL do Pages e, quando houver, o parâmetro `clube`. Se quiser preservar o link completo em confirmações abertas em outro dispositivo, confira que a allowlist de Redirect URLs do Supabase aceita a rota de retorno com query (por exemplo, o padrão específico do projeto `https://kvzinncpx7.github.io/BOSTA3/**`). A aplicação não altera essa configuração automaticamente. No mesmo navegador, o convite local continua disponível mesmo se o serviço retornar à Site URL sem a query.
 
 O aviso de confirmação é limpo após autenticação, inclusive com respostas atrasadas do cadastro. Nenhum esquema SQL ou política RLS adicional é necessário para essas correções. Recordes, chat de NPCs e segredos continuam locais; os campos enviados ao ranking existente permanecem os mesmos.
+
+
+## Continuar a carreira no PC e no celular
+
+1. Após instalar a migração **002_private_cloud_saves.sql** e revisar/publicar a versão, abra **Minha carreira**.
+2. Entre ou crie a conta com o mesmo e-mail e senha usados nas ligas. Não é uma segunda conta.
+3. No aparelho onde está seu progresso, clique **Ativar nuvem com esta carreira**.
+4. Aguarde a confirmação do save. O automático roda a cada 15 segundos enquanto a página estiver aberta; **Salvar agora** permite confirmar antes de sair.
+5. No outro aparelho, faça login e escolha **Continuar carreira da nuvem**. Não escolha substituir a nuvem pela carteira vazia do aparelho novo.
+
+Toda sessão pede uma escolha antes de associar a carreira local à conta. Saves não são combinados e não há ganhos simulados enquanto o jogo está fechado. Use um aparelho por vez. Caso dois aparelhos salvem, a revisão atômica recusa a gravação atrasada e pede uma nova escolha, preservando a carteira local. Uma falha de rede para o automático e permite rever os saves ao reconectar. Não há promessa de envio ao fechar a aba: aguarde **Salvar agora**.
+
+Antes de recuperar a nuvem, a cópia local vai para `bosta3-before-cloud-v1` no navegador. Antes de substituir um save remoto, ele vai para `bosta3-cloud-before-replace-v1`. Há também download JSON da carreira local. O save principal continua em `bosta3-game-v1`; nenhum save existente é apagado. Esses backups são locais e não substituem a sincronização. Sair da conta não apaga a cópia local: evite aparelhos compartilhados.
+
+### Privacidade e segurança
+
+A nova tabela `game_saves` é separada de `players`, `clubs` e `club_members`. Só o dono autenticado lê sua linha, inclusive quando está na mesma liga de outra pessoa. Escritas diretas são negadas; `save_game` verifica a identidade e a revisão esperada atomicamente. A migração é aditiva e pode ser repetida sem apagar saves. Não necessita chave privada, service_role ou novas variáveis públicas.
+
+A nuvem guarda a carteira fictícia, perfil, ações, XP, operações, conquistas, histórico e resenha. Não envia sessões, senhas, e-mail da autenticação ou convites. É um save de jogo editável no cliente, sem integridade competitiva; não atualiza automaticamente o ranking das ligas. As preferências de som e movimento continuam próprias de cada aparelho.
+
+Se aparecer o aviso da migração 002, o SQL ainda não foi instalado ou a API não reconheceu a função/tabela. Execute o arquivo completo no SQL Editor e tente novamente. O jogo local continua funcionando mesmo com essa configuração pendente.

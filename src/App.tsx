@@ -1,3 +1,4 @@
+import { CloudCareer } from "./components/CloudCareer";
 import { PainhoPrank } from "./components/PainhoPrank";
 import { ResenhaHub, type HubTab } from "./components/ResenhaHub";
 import { useSecrets } from "./components/useSecrets";
@@ -96,6 +97,7 @@ const nav = [
 ];
 export default function App() {
   const [game, setGame] = useState(loadGame);
+  const [cloudRestoreVersion, setCloudRestoreVersion] = useState(0);
   const [tab, setTab] = useState<Tab>(
     new URLSearchParams(window.location.search).has("clube")
       ? "Clube do Boleto"
@@ -481,6 +483,7 @@ export default function App() {
               A preferência de humor não pôde ser salva. Ela vale nesta sessão.
             </div>
           )}
+          <CloudCareer game={game} restore={(next) => { setSelected(null); setReset(false); setError(""); setGame(next); setCloudRestoreVersion((v) => v + 1); }} openAccount={() => setTab("Minha carreira")} />
           <PainhoPrank enabled={preferences.extraordinary} sound={preferences.sound} effects={preferences.effects} blocked={!!selected || guide || reset || !!featured} newsKey={`${game.news[0]?.id}:${game.news[0]?.time}`} />
           {featured && (
             <SpecialNotice
@@ -928,7 +931,7 @@ export default function App() {
             </>
           )}
           {tab === "Minha carreira" && (
-            <CareerPanel game={game} update={updateLocal} notify={notify} />
+            <><SocialPanel game={game} notify={notify} accountOnly /><CareerPanel key={cloudRestoreVersion} game={game} update={updateLocal} notify={notify} /></>
           )}
           {tab === "IPO de Pote" && (
             <CompanyPanel game={game} update={updateLocal} notify={notify} />
