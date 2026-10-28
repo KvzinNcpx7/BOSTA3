@@ -486,6 +486,7 @@ export default function App() {
               active={featured}
               now={eventNow}
               effects={preferences.effects && !selected && !guide && !reset}
+              displayedWealth={wealth(game)}
             />
           )}
           {game.fun.bulletin &&
