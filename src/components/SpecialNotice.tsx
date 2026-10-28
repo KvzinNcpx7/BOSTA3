@@ -25,8 +25,12 @@ export function SpecialNotice({
           {event.emoji}
         </span>
         <div>
-          <div className="eyebrow">COMUNICADO EXTRAORDINÁRIO · {seconds}s</div>
-          <h2>{event.name}</h2>
+          <div className="eyebrow">PLANTÃO BOSTA NEWS · {seconds}s</div>
+          <h2>
+            {event.id === "erika"
+              ? "ÉRIKA DA GALERA CONVOCA TODOS OS ACIONISTAS. METADE NEM SABIA QUE TINHA AÇÕES."
+              : event.name}
+          </h2>
           {!collapsed && (
             <>
               <p>{event.description}</p>

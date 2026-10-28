@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { chooseBanter, characters, type Context } from "../game/banter";
+import {
+  chooseBanter,
+  characters,
+  type Context,
+  type CharacterId,
+} from "../game/banter";
 import { wealth, type Game } from "../game/engine";
 export function useBanter(
   game: Game,
@@ -15,9 +20,16 @@ export function useBanter(
     news: game.news[0],
     school,
     unlocked: game.unlocked,
+    secrets: game.fun.secrets,
   });
-  const say = (context: Context, toast = false) => {
-    const selected = chooseBanter(context, school, recent.current);
+  const say = (context: Context, toast = false, forced?: CharacterId) => {
+    const selected = chooseBanter(
+      context,
+      school,
+      recent.current,
+      Math.random,
+      forced,
+    );
     recent.current = [...recent.current, selected.text].slice(-8);
     setComment(selected);
     if (toast) notify(`${characters[selected.speaker].name}: ${selected.text}`);
@@ -32,7 +44,11 @@ export function useBanter(
       news: game.news[0],
       school,
       unlocked: game.unlocked,
+      secrets: game.fun.secrets,
     };
+    const milestone =
+      game.unlocked.some((id) => !p.unlocked.includes(id)) ||
+      game.fun.secrets.some((id) => !p.secrets.includes(id));
     if (p.school !== school) {
       say("welcome");
       return;
@@ -47,11 +63,12 @@ export function useBanter(
           : game.realized < p.realized
             ? "sellLoss"
             : "sell",
-        !game.unlocked.some((id) => !p.unlocked.includes(id)),
+        !milestone,
       );
-    } else if (total >= 1000000 && p.total < 1000000) say("rich", true);
-    else if (total - p.total >= 200) say("gain", true);
-    else if (total - p.total <= -200) say("loss", true);
+    } else if (total >= 1000000 && p.total < 1000000) say("rich", !milestone);
+    else if (total - p.total >= 200) say("gain", !milestone);
+    else if (total - p.total <= -200)
+      say("loss", !milestone, total <= 9500 ? "fiscal" : undefined);
     else if (game.news[0] !== p.news) say("event");
   }, [game, school]);
   return { comment, say };

@@ -121,3 +121,38 @@ O jogo mantém a versão do save em 2 e a chave `bosta3-game-v1`. Saves v1/v2 re
 Nenhuma migração nova de banco, mudança de autenticação, chave, política RLS ou configuração do Supabase é necessária. O workflow e o caminho `/BOSTA3/` do GitHub Pages permanecem iguais. A atualização deve ser revisada pela PR antes da integração em `main`.
 
 Os testes adicionais incluem um catálogo fixo da v2 para verificar IDs/ordem/conteúdo, migração de saves, segregação dos modos, efeitos dos cinco especiais, cooldown/expiração, dividendos, conquistas, preferência persistida, formulário de negociação durante a greve e compartilhamento seguro. Testes de interface usam DOM simulado; não substituem inspeção visual em navegadores reais.
+
+## Pacote final da Resenha: Central, Zap e comprovantes
+
+A atualização continua na mesma PR do Modo Resenha e **não publica nem faz merge automaticamente**. A **Central da Resenha**, no menu e na visão geral, reúne quatro abas para manter o terminal financeiro limpo:
+
+- **Zap dos Acionistas**: NPCs locais reagem a operações, notícias, crises e assembleias. Até 40 mensagens são salvas por carreira; há variação sem repetição consecutiva e os personagens escolares respeitam o modo opcional. Irineu, Primo do Primo, Fiscal do Serasa Fictício e CEOs não são pessoas conversando de verdade. Nenhuma mensagem é enviada para outros jogadores ou serviços.
+- **Assembleia**: três pautas com quatro decisões cada. O jogador escolhe uma proposta, revisa os efeitos e confirma o voto. As opções alteram cotações diferentes; não debitam caixa nem alteram quantidades. Só um voto é aceito por convocação. Prazo de cinco minutos, intervalo de três minutos e recusa/expiração sem decisão oculta. Assembleias podem aparecer nas rodadas com notícia (6%, com extraordinários habilitados) ou ser convocadas explicitamente.
+- **Recordes**: maior lucro e prejuízo patrimonial observados em relação aos R$ 10 mil iniciais, crises/extraordinários, operações, segredos e conquistas. Tudo permanece local; nenhum campo novo é enviado às ligas. Na migração de saves antigos, usamos somente os dados ainda disponíveis, sem inventar o histórico perdido.
+- **Comprovante de Vergonha**: prévia, download PNG de 1200 × 1500 e compartilhamento de arquivo quando suportado pelo navegador. O card usa apelido fictício revisável (começa genérico), patrimônio, máximas de lucro/prejuízo, título, selo e frase sorteada. Nunca lê e-mail, sessão, token ou convite. Validação recusa contatos e links no apelido. O resultado é uma captura do momento da geração; ao regenerar ou sair, URLs temporárias são liberadas.
+
+### Plantão Bosta News e o Fiscal
+
+Os cinco especiais anteriores permanecem e recebem apresentação de plantão. Acrescentamos **Irineu assume a diretoria econômica** (FOFO3 +5%; TIGR3 oscila até 6%) e **Iararara ouvida a 7 km** (pausa de ordens por 5 segundos, somente escolar). A greve CLT original continua com 8 segundos. Os IDs/índices dos primeiros cinco especiais também são preservados.
+
+Quedas observadas de pelo menos 12% podem gerar o plantão “CARAI BORRACHA! O MERCADO FOI DE ARRASTA!”, com intervalo de 90 segundos entre esses alertas. O plantão relata um movimento já ocorrido; não aplica uma queda extra. Sons continuam opt-in e podem ser silenciados nas preferências. Efeitos respeitam movimento reduzido e são suprimidos durante os diálogos de operações. No celular, notificações ficam no fluxo da página, sem cobrir ordens ou navegação.
+
+O Fiscal aparece em limiares de patrimônio (R$ 9.500, R$ 8.500 e R$ 5.000), sem repetir a mesma visita em todo tick, e reage a perdas no painel de assessoria. Ele fiscaliza apenas a ficção do jogo: não consulta nem representa nenhum serviço financeiro real.
+
+### Treze segredos, zero prejuízo escondido
+
+Há 13 descobertas opcionais. Dicas ficam em **Central → Recordes**, e o critério completo aparece após encontrar o segredo. Os gatilhos incluem cliques no logo, palavras fora dos campos, lote de 69 ações, patrimônio baixo, vendas com prejuízo, coleção das empresas e metas da carreira. Os atalhos ignoram campos de senha, texto, seleção, conteúdo editável e diálogos; não salvam nem enviam o que é digitado. Nenhum segredo altera dinheiro, preços ou posições.
+
+### Correções de login e convites
+
+A confirmação de e-mail antiga é limpa após login, inclusive quando uma resposta de cadastro chega atrasada. Uma leitura antiga da sessão não substitui um login mais recente. Contas, credenciais e políticas do banco permanecem intactas.
+
+Convites aceitam código ou link completo. O código é normalizado, guardado localmente por até sete dias e preservado no retorno da confirmação de e-mail. Entrar na liga exige clique explícito; após sucesso, o convite pendente e o parâmetro `clube` são limpos. Erros não apagam o convite. Nenhum convite aparece nos cards PNG.
+
+### Compatibilidade e validação
+
+O campo adicional `fun` contém chat, recordes, segredos, atas e alertas locais. Sua migração é independente: ausência ou corrupção desse campo não reinicia caixa, posições, resenha, perfil ou conquistas. A chave financeira e a versão de save continuam as mesmas. Reiniciar a carreira pelo botão de confirmação também reinicia esses dados locais, como informado na interface.
+
+Os testes cobrem migração, recordes persistidos, mensagens e critérios de segredos, efeitos e voto único nas 12 opções das assembleias, login/convites com respostas atrasadas, privacidade do payload e geração de um PNG real com assinatura e dimensões verificadas. `@napi-rs/canvas` é dependência **apenas de desenvolvimento** para verificar o PNG; no navegador, a aplicação usa Canvas nativo, sem upload ou API de imagens.
+
+Continuam os mesmos comandos `npm test` e `npm run build`, o caminho `/BOSTA3/` e o workflow de validação. Não há migração SQL nova nem mudança destrutiva de banco. Testes de interface usam DOM simulado; envio real de e-mail/compartilhamento nativo depende do serviço e do navegador do jogador.

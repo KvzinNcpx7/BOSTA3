@@ -49,6 +49,8 @@ export function freshResenha(): ResenhaState {
       strike: 0,
       priscila: 0,
       cantina: 0,
+      irineu: 0,
+      iarPause: 0,
     },
     completed: [],
     recentEvents: [],
@@ -122,7 +124,7 @@ export function activeSpecial(r: ResenhaState, now = Date.now()) {
   return r.active && r.active.until > now ? r.active : null;
 }
 export function tradeBlocked(r: ResenhaState, now = Date.now()) {
-  return activeSpecial(r, now)?.kind === "strike";
+  return ["strike", "iarPause"].includes(activeSpecial(r, now)?.kind || "");
 }
 export function enabledSpecial(
   r: ResenhaState,

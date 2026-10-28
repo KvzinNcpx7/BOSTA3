@@ -1,3 +1,9 @@
+import { ResenhaHub, type HubTab } from "./components/ResenhaHub";
+import { useSecrets } from "./components/useSecrets";
+import { observeFun } from "./game/fun";
+import { expireFun } from "./game/meetings";
+import { secrets } from "./game/funContent";
+import { PlantaoNotice } from "./components/PlantaoNotice";
 import { useEffect, useRef, useState } from "react";
 import { useDialogFocus } from "./components/useDialogFocus";
 import {
@@ -27,6 +33,7 @@ import {
   Users,
   BriefcaseBusiness,
   ScrollText,
+  MessageCircle,
 } from "lucide-react";
 import { achievements } from "./game/data";
 import {
@@ -39,6 +46,7 @@ import {
   trade,
   wealth,
   type Asset,
+  type Game,
 } from "./game/engine";
 import { Chart } from "./components/Chart";
 import {
@@ -60,7 +68,6 @@ import {
   HUMOR_KEY,
   type HumorPreferences,
 } from "./game/resenha";
-import { specialEvents } from "./game/resenhaContent";
 import { advanceMarket, finishSpecial, recordShare } from "./game/simulation";
 import { unlockSound, playSpecialTone } from "./services/sound";
 type Tab =
@@ -72,7 +79,8 @@ type Tab =
   | "Minha carreira"
   | "IPO de Pote"
   | "Clube do Boleto"
-  | "Extrato";
+  | "Extrato"
+  | "Central da Resenha";
 const nav = [
   { name: "Visão geral" as Tab, icon: LayoutDashboard },
   { name: "Mercado" as Tab, icon: ChartNoAxesCombined },
@@ -83,6 +91,7 @@ const nav = [
   { name: "IPO de Pote" as Tab, icon: BriefcaseBusiness },
   { name: "Clube do Boleto" as Tab, icon: Users },
   { name: "Extrato" as Tab, icon: ScrollText },
+  { name: "Central da Resenha" as Tab, icon: MessageCircle },
 ];
 export default function App() {
   const [game, setGame] = useState(loadGame);
@@ -91,11 +100,14 @@ export default function App() {
       ? "Clube do Boleto"
       : "Visão geral",
   );
+  const [hubTab, setHubTab] = useState<HubTab>("Zap");
   const [paused, setPaused] = useState(false);
+
   const [preferences, setPreferences] = useState(() => ({
     ...loadHumorPreferences(),
     sound: false,
   }));
+  const hitLogo = useSecrets(preferences.school, setGame);
   const [humorSaveFailed, setHumorSaveFailed] = useState(false);
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
@@ -110,20 +122,42 @@ export default function App() {
     }
   }, [preferences]);
   useEffect(() => {
-    if (!game.resenha.active) return;
+    if (!game.resenha.active && !game.fun.bulletin) return;
     setNow(Date.now());
     const clock = setInterval(() => {
       setNow(Date.now());
-      setGame((g) => finishSpecial(g));
+      setGame((g) => expireFun(finishSpecial(g)));
     }, 500);
     return () => clearInterval(clock);
-  }, [game.resenha.active?.startedAt]);
+  }, [game.resenha.active?.startedAt, game.fun.bulletin?.startedAt]);
+  useEffect(() => {
+    if (!game.fun.meeting) return;
+    const timer = setTimeout(
+      () => setGame((g) => expireFun(g)),
+      Math.max(0, game.fun.meeting.expiresAt - Date.now()),
+    );
+    return () => clearTimeout(timer);
+  }, [game.fun.meeting?.id]);
+  const seenBulletin = useRef(game.fun.bulletin?.startedAt);
+  useEffect(() => {
+    const start = game.fun.bulletin?.startedAt;
+    if (start && seenBulletin.current !== start) {
+      seenBulletin.current = start;
+      playSpecialTone(preferences.sound && preferences.extraordinary);
+    }
+  }, [game.fun.bulletin?.startedAt, preferences.sound]);
+  useEffect(() => {
+    setGame((g) => {
+      const r = enabledSpecial(g.resenha, preferences);
+      return r === g.resenha ? g : { ...g, resenha: r };
+    });
+  }, [preferences.school, preferences.extraordinary]);
   const seenSpecial = useRef(game.resenha.active?.startedAt);
   useEffect(() => {
     const start = game.resenha.active?.startedAt;
     if (start && seenSpecial.current !== start) {
       seenSpecial.current = start;
-      playSpecialTone(preferences.sound);
+      playSpecialTone(preferences.sound && preferences.extraordinary);
     }
   }, [game.resenha.active?.startedAt, preferences.sound]);
   const [query, setQuery] = useState("");
@@ -185,6 +219,22 @@ export default function App() {
   const asset = game.assets.find((a) => a.symbol === selected);
   const holding = asset ? game.positions[asset.symbol] : undefined;
   const notify = (text: string) => setToast(text);
+  const knownSecrets = useRef(game.fun.secrets);
+  useEffect(() => {
+    const found = game.fun.secrets.find(
+      (id) => !knownSecrets.current.includes(id),
+    );
+    knownSecrets.current = game.fun.secrets;
+    if (found)
+      notify(
+        `🔎 Segredo: ${secrets.find((s) => s.id === found)?.name}. Registrado nos recordes locais.`,
+      );
+  }, [game.fun.secrets]);
+  const openHub = (section: HubTab = "Zap") => {
+    setHubTab(section);
+    setTab("Central da Resenha");
+  };
+  const updateLocal = (next: Game) => setGame(observeFun(next));
   const { comment, say } = useBanter(game, preferences.school, notify);
   const speaker = characters[comment.speaker];
   const eventNow = Math.max(now, game.resenha.active?.startedAt || 0);
@@ -255,6 +305,7 @@ export default function App() {
           href="#"
           onClick={(e) => {
             e.preventDefault();
+            hitLogo();
             setTab("Visão geral");
           }}
         >
@@ -268,16 +319,21 @@ export default function App() {
           </span>
         </a>
         <div className="workspace-label">SEU TERMINAL DO CAOS</div>
-        <nav>
+        <nav aria-label="Navegação do terminal">
           {nav.map((n) => (
             <button
               className={tab === n.name ? "nav-item active" : "nav-item"}
               key={n.name}
+              aria-label={n.name}
+              aria-current={tab === n.name ? "page" : undefined}
               onClick={() => setTab(n.name)}
             >
               <n.icon size={18} />
               <span>{n.name}</span>
-              {n.name === "Jornal do Caos" && <span className="nav-dot" />}
+              {(n.name === "Jornal do Caos" ||
+                (n.name === "Central da Resenha" && game.fun.meeting)) && (
+                <span className="nav-dot" />
+              )}
               {n.name === "Conquistas" && (
                 <small>
                   {visibleUnlocked}/{visibleAchievements.length}
@@ -387,7 +443,9 @@ export default function App() {
                               ? "O prejuízo é nosso. A zoeira é coletiva."
                               : tab === "Extrato"
                                 ? "Toda péssima ideia deixa um recibo."
-                                : "Pequenas vitórias. Grandes questionamentos."}
+                                : tab === "Central da Resenha"
+                                  ? "O mercado está sério. O grupo, nem tanto."
+                                  : "Pequenas vitórias. Grandes questionamentos."}
               </h1>
               <p>
                 {tab === "Visão geral"
@@ -401,6 +459,18 @@ export default function App() {
               <ArrowUpRight size={16} />
             </button>
           </section>
+          {toast && !asset && !guide && !reset && game.started && (
+            <div className="toast" role="status">
+              <Check size={19} />
+              <span>{toast}</span>
+              <button
+                aria-label="Fechar notificação"
+                onClick={() => setToast("")}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
           <ResenhaControls
             preferences={preferences}
             onChange={changePreference}
@@ -415,14 +485,48 @@ export default function App() {
               key={featured.startedAt}
               active={featured}
               now={eventNow}
-              effects={preferences.effects}
+              effects={preferences.effects && !selected && !guide && !reset}
             />
           )}
+          {game.fun.bulletin &&
+            game.fun.bulletin.until >
+              Math.max(now, game.fun.bulletin.startedAt) &&
+            !featured &&
+            preferences.extraordinary && (
+              <PlantaoNotice
+                key={game.fun.bulletin.startedAt}
+                bulletin={game.fun.bulletin}
+                now={Math.max(now, game.fun.bulletin.startedAt)}
+                effects={preferences.effects && !selected && !guide && !reset}
+              />
+            )}
           {saveFailed && (
             <div className="save-warning" role="alert">
               Não foi possível salvar neste navegador. Seu progresso desta
               sessão continua disponível.
             </div>
+          )}
+          {tab === "Visão geral" && (
+            <section className="central-invite">
+              <div>
+                <strong>
+                  {game.fun.meeting
+                    ? "📋 Assembleia aguardando seu voto"
+                    : "💬 O Zap dos Acionistas está digitando…"}
+                </strong>
+                <p>
+                  Conversas de NPCs, recordes locais e um comprovante que
+                  deveria vir com terapia.
+                </p>
+              </div>
+              <button
+                className="trade-button"
+                onClick={() => openHub(game.fun.meeting ? "Assembleia" : "Zap")}
+              >
+                {game.fun.meeting ? "Abrir pauta" : "Central da Resenha"}{" "}
+                <ArrowRight size={14} />
+              </button>
+            </section>
           )}
           {(tab === "Visão geral" || tab === "Minha carteira") && (
             <section className="stats">
@@ -821,15 +925,24 @@ export default function App() {
             </>
           )}
           {tab === "Minha carreira" && (
-            <CareerPanel game={game} update={setGame} notify={notify} />
+            <CareerPanel game={game} update={updateLocal} notify={notify} />
           )}
           {tab === "IPO de Pote" && (
-            <CompanyPanel game={game} update={setGame} notify={notify} />
+            <CompanyPanel game={game} update={updateLocal} notify={notify} />
           )}
           {tab === "Clube do Boleto" && (
             <SocialPanel game={game} notify={notify} />
           )}
           {tab === "Extrato" && <HistoryPanel game={game} />}
+          {tab === "Central da Resenha" && (
+            <ResenhaHub
+              game={game}
+              school={preferences.school}
+              update={updateLocal}
+              notify={notify}
+              initial={hubTab}
+            />
+          )}
           <footer>
             <span>
               <button
@@ -858,15 +971,6 @@ export default function App() {
           </footer>
         </div>
       </main>
-      {toast && (
-        <div className="toast" role="status">
-          <Check size={19} />
-          <span>{toast}</span>
-          <button aria-label="Fechar notificação" onClick={() => setToast("")}>
-            <X size={16} />
-          </button>
-        </div>
-      )}
       {asset && (
         <div className="modal-backdrop" onClick={() => setSelected(null)}>
           <section
@@ -991,7 +1095,7 @@ export default function App() {
               disabled={blocked}
             >
               {blocked
-                ? `Greve CLT · ${Math.max(0, Math.ceil(((featured?.until || eventNow) - eventNow) / 1000))}s`
+                ? `${featured?.kind === "iarPause" ? "Pausa Iararara" : "Greve CLT"} · ${Math.max(0, Math.ceil(((featured?.until || eventNow) - eventNow) / 1000))}s`
                 : side === "buy"
                   ? "Confirmar compra"
                   : "Confirmar venda"}{" "}
@@ -1070,9 +1174,9 @@ export default function App() {
           >
             <h2 id="reset-title">Declarar falência emocional?</h2>
             <p>
-              Isso apaga sua carteira, perfil, empresas, missões, histórico e
-              conquistas neste navegador. O placar já publicado no clube não é
-              apagado. Você recomeça com R$ 10.000 fictícios.
+              Isso apaga sua carteira, perfil, empresas, missões, histórico,
+              recordes e segredos neste navegador. O placar já publicado no
+              clube não é apagado. Você recomeça com R$ 10.000 fictícios.
             </p>
             <div className="reset-actions">
               <button className="trade-button" onClick={() => setReset(false)}>

@@ -72,7 +72,8 @@ function NewsCard({
             ))}
           {!Object.values(n.impacts).some((v) => v !== 0) && (
             <span>
-              Ordens suspensas por 8 segundos. Sem choque direto nas cotações.
+              Ordens suspensas por {n.special === "iarPause" ? 5 : 8} segundos.
+              Sem choque direto nas cotações.
             </span>
           )}
         </div>

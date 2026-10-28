@@ -106,7 +106,10 @@ describe("seleção e falas", () => {
       expect(recent).not.toContain(id);
       recent = [...recent, id].slice(-6);
     }
-    expect(chooseSpecial(false, () => 0.99)).toBe("strike");
+    expect(
+      specialEvents.find((e) => e.id === chooseSpecial(false, () => 0.99))
+        ?.school,
+    ).toBe(false);
   });
   it("modo escolar inclui notícias próprias e comunicados da Érika", () => {
     expect(events[chooseEvent(true, [], () => 0.99)].school).toBe(true);

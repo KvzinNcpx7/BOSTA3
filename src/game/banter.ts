@@ -233,10 +233,15 @@ export function chooseBanter(
   school: boolean,
   recent: string[] = [],
   rng = Math.random,
+  forced?: CharacterId,
 ): Banter {
-  const eligible = entries[context].filter(
+  const candidates = entries[context].filter(
     ([speaker]) => school || !characters[speaker].school,
   );
+  const filtered = forced
+    ? candidates.filter(([speaker]) => speaker === forced)
+    : candidates;
+  const eligible = filtered.length ? filtered : candidates;
   const remaining = eligible.filter(([, text]) => !recent.includes(text));
   const pool = remaining.length
     ? remaining

@@ -384,7 +384,13 @@ export const newHeadlines: Headline[] = [
   })),
 ];
 export type SpecialKind =
-  "iararara" | "erika" | "strike" | "priscila" | "cantina";
+  | "iararara"
+  | "erika"
+  | "strike"
+  | "priscila"
+  | "cantina"
+  | "irineu"
+  | "iarPause";
 export const specialEvents: {
   id: SpecialKind;
   name: string;
@@ -447,6 +453,28 @@ export const specialEvents: {
     description:
       "Heide Holdings confirmou: acabou a coxinha. O guardanapo foi vendido separadamente.",
     consequence: "BOLO4 cai 22%, SONO3 sobe 7% e os demais ativos recuam 6%.",
+  },
+  {
+    id: "irineu",
+    name: "IRINEU ASSUME A DIRETORIA ECONÔMICA",
+    emoji: "🗿",
+    school: false,
+    duration: 10000,
+    description:
+      "Ninguém sabe o motivo. Nem ele. O crachá veio com ponto de interrogação.",
+    consequence:
+      "FOFO3 sobe 5%; TIGR3 reage à nomeação com uma oscilação de até 6%.",
+  },
+  {
+    id: "iarPause",
+    name: "IARARARA OUVIDA A 7 KM DE DISTÂNCIA",
+    emoji: "📢",
+    school: true,
+    duration: 5000,
+    description:
+      "O microfone chegou antes do comunicado. O departamento de ouvidos pediu um intervalo.",
+    consequence:
+      "Compras e vendas pausam por 5 segundos. As cotações continuam oscilando.",
   },
 ];
 export const resenhaAchievements = [

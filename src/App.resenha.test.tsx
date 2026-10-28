@@ -5,6 +5,7 @@ import {
   cleanup,
   fireEvent,
   act,
+  within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import App from "./App";
@@ -130,5 +131,29 @@ describe("Modo Resenha Escolar integrado", () => {
       screen.getByRole<HTMLInputElement>("checkbox", { name: /Alerta sonoro/ })
         .checked,
     ).toBe(false);
+  });
+  it("todas as telas existentes e a Central continuam acessíveis sem alterar a carteira", () => {
+    const g = { ...fresh(), started: true };
+    start(g);
+    const nav = screen.getByRole("navigation", {
+      name: "Navegação do terminal",
+    });
+    const screens = [
+      ["Mercado", /Mercado de memes/],
+      ["Minha carteira", /Meus ativos/],
+      ["Jornal do Caos", /Jornal do Caos/],
+      ["Conquistas", /de 17 conquistas/],
+      ["Minha carreira", /Departamento de identidade questionável/],
+      ["IPO de Pote", /Abra seu unicórnio/],
+      ["Clube do Boleto", /Falta ligar o cartório digital/],
+      ["Extrato", /Extrato de arrependimentos/],
+      ["Central da Resenha", /Zap dos Acionistas/],
+    ] as const;
+    for (const [name, heading] of screens) {
+      fireEvent.click(within(nav).getByRole("button", { name }));
+      expect(screen.getByRole("heading", { name: heading })).toBeTruthy();
+    }
+    expect(saved().cash).toBe(g.cash);
+    expect(saved().positions).toEqual(g.positions);
   });
 });

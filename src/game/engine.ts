@@ -1,3 +1,4 @@
+import { freshFun, restoreFun, observeFun, type FunState } from "./fun";
 import {
   freshResenha,
   restoreResenha,
@@ -32,6 +33,7 @@ export type News = {
 export type Game = {
   version: 2;
   resenha: ResenhaState;
+  fun: FunState;
   career: Career;
   cash: number;
   assets: Asset[];
@@ -53,6 +55,7 @@ export function fresh(): Game {
   return {
     version: 2,
     resenha: freshResenha(),
+    fun: freshFun(),
     career: freshCareer(),
     cash: 10000,
     assets: companies.map((a, j) => ({
@@ -117,7 +120,7 @@ export function award(g: Game): Game {
     economicsRecovery: lowestWealth <= 9500 && w >= 10000 && g.trades > 0,
     lossKing: r.lossSales >= 5 && g.realized <= -5000,
   };
-  return {
+  return observeFun({
     ...g,
     resenha: { ...r, lowestWealth },
     unlocked: [
@@ -126,7 +129,7 @@ export function award(g: Game): Game {
         ...Object.keys(checks).filter((k) => checks[k]),
       ]),
     ],
-  };
+  });
 }
 export function trade(
   g: Game,
@@ -137,7 +140,9 @@ export function trade(
 ): Game {
   if (tradeBlocked(g.resenha, now))
     throw Error(
-      "Greve CLT: ordens suspensas por alguns segundos. O vale-refeição ainda não caiu.",
+      activeSpecial(g.resenha, now)?.kind === "iarPause"
+        ? "Pausa Iararara: o pregão volta em até 5 segundos. Nenhuma ordem foi debitada."
+        : "Greve CLT: ordens suspensas por alguns segundos. O vale-refeição ainda não caiu.",
     );
   const a = g.assets.find((a) => a.symbol === symbol);
   if (!a || !Number.isSafeInteger(quantity) || quantity < 1)
@@ -350,12 +355,13 @@ export function loadGame(): Game {
       )
     )
       return fresh();
-    return {
+    const migrated: Game = {
       ...g,
       version: 2,
       career: currentCareer(career),
       resenha: restoreResenha(g.resenha),
     };
+    return { ...migrated, fun: restoreFun(g.fun, migrated) };
   } catch {
     return fresh();
   }

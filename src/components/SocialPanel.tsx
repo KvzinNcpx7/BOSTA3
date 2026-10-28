@@ -1,4 +1,12 @@
-import { useEffect, useState } from "react";
+import {
+  pendingInvite,
+  parseInvite,
+  rememberInvite,
+  clearInvite,
+  signupReturnUrl,
+  socialError,
+} from "../services/invitations";
+import { useEffect, useState, useRef } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Users, Copy, RefreshCw, LogOut } from "lucide-react";
 import {
@@ -28,32 +36,39 @@ export function SocialPanel({
   const [selected, setSelected] = useState("");
   const [rows, setRows] = useState<RankingRow[]>([]);
   const [name, setName] = useState("");
-  const [invite, setInvite] = useState(
-    () => new URLSearchParams(window.location.search).get("clube") || "",
-  );
-  const fail = (e: unknown) => {
-    console.error(
-      "Clube BOSTA3:",
-      e instanceof Error ? e.message : "Falha no serviço",
-    );
-    setMessage(
-      "O cartório digital recusou o protocolo. Confira os dados e a configuração do clube e tente novamente.",
-    );
-  };
+  const [invite, setInvite] = useState(pendingInvite);
+  const currentSession = useRef<Session | null>(null);
+  useEffect(() => {
+    if (parseInvite(invite)) rememberInvite(invite);
+  }, [invite]);
+  const fail = (e: unknown) => setMessage(socialError(e));
   useEffect(() => {
     if (!supabase) return;
     let live = true;
+    let authChanged = false;
     supabase.auth
       .getSession()
       .then(({ data, error }) => {
+        if (!live || authChanged) return;
         if (error) fail(error);
-        if (live) setSession(data.session);
+        currentSession.current = data.session;
+        setSession(data.session);
+        if (data.session) setMessage("");
       })
-      .catch(fail);
+      .catch((e) => {
+        if (live && !authChanged) fail(e);
+      });
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, next) => {
-      if (live) setSession(next);
+      if (!live) return;
+      authChanged = true;
+      currentSession.current = next;
+      setSession(next);
+      if (next && _event === "SIGNED_IN") {
+        setMessage("");
+        setPassword("");
+      }
     });
     return () => {
       live = false;
@@ -73,7 +88,9 @@ export function SocialPanel({
             setSelected(v[0]?.id || "");
           }
         })
-        .catch(fail);
+        .catch((e) => {
+          if (live) fail(e);
+        });
     return () => {
       live = false;
     };
@@ -86,7 +103,9 @@ export function SocialPanel({
         .then((v) => {
           if (live) setRows(v);
         })
-        .catch(fail);
+        .catch((e) => {
+          if (live) fail(e);
+        });
     return () => {
       live = false;
     };
@@ -167,14 +186,14 @@ export function SocialPanel({
                     email,
                     password,
                     options: {
-                      emailRedirectTo:
-                        window.location.origin + window.location.pathname,
+                      emailRedirectTo: signupReturnUrl(invite),
                     },
                   });
                   if (error) throw error;
+                  setPassword("");
                   setMessage(
-                    data.session
-                      ? "Conta criada. Bem-vindo à sociedade do prejuízo."
+                    data.session || currentSession.current
+                      ? ""
                       : "Confira seu e-mail para confirmar a conta. O boleto de boas-vindas é metafórico.",
                   );
                 } else {
@@ -184,6 +203,7 @@ export function SocialPanel({
                   });
                   if (error) throw error;
                   setPassword("");
+                  setMessage("");
                 }
               });
             }}
@@ -192,14 +212,20 @@ export function SocialPanel({
               <button
                 type="button"
                 className={mode === "login" ? "buy selected" : ""}
-                onClick={() => setMode("login")}
+                onClick={() => {
+                  setMode("login");
+                  setMessage("");
+                }}
               >
                 Já sou sócio do caos
               </button>
               <button
                 type="button"
                 className={mode === "signup" ? "buy selected" : ""}
-                onClick={() => setMode("signup")}
+                onClick={() => {
+                  setMode("signup");
+                  setMessage("");
+                }}
               >
                 Abrir conta
               </button>
@@ -215,13 +241,13 @@ export function SocialPanel({
               />
             </label>
             <label>
-              Senha (mínimo 8 caracteres)
+              {mode === "signup" ? "Senha (mínimo 8 caracteres)" : "Senha"}
               <input
                 type="password"
                 autoComplete={
                   mode === "signup" ? "new-password" : "current-password"
                 }
-                minLength={8}
+                minLength={mode === "signup" ? 8 : 1}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -335,11 +361,14 @@ export function SocialPanel({
               onSubmit={(e) => {
                 e.preventDefault();
                 action(async () => {
+                  const code = parseInvite(invite);
+                  if (!code) throw Error("Convite inválido");
                   await shareScore(game);
                   const { data, error } = await supabase!.rpc("join_club", {
-                    code: invite.trim().toLowerCase(),
+                    code,
                   });
                   if (error) throw error;
+                  clearInvite();
                   setInvite("");
                   const list = await clubs();
                   setGroups(list);
@@ -352,13 +381,18 @@ export function SocialPanel({
                 Código enviado por um amigo
                 <input
                   required
-                  pattern="[a-fA-F0-9]{32}"
-                  maxLength={32}
-                  placeholder="Cole os 32 caracteres do convite"
+                  maxLength={512}
+                  placeholder="Cole o link completo ou o código de 32 caracteres"
+                  aria-describedby="invite-help"
                   value={invite}
                   onChange={(e) => setInvite(e.target.value)}
                 />
               </label>
+              <p className="form-help" id="invite-help">
+                Seu convite fica guardado neste navegador por até 7 dias,
+                inclusive durante a confirmação do e-mail. Você escolhe quando
+                entrar.
+              </p>
               <button className="trade-button" disabled={busy}>
                 Entrar nessa sociedade
               </button>
@@ -402,6 +436,7 @@ export function SocialPanel({
                   {group && (
                     <button
                       className="trade-button"
+                      disabled={busy}
                       onClick={() =>
                         action(async () => {
                           const url = new URL(

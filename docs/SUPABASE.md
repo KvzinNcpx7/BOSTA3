@@ -55,3 +55,11 @@ Somente membros podem consultar o ranking de uma liga. Contas diferentes não po
 - Empresas criadas pelo jogador ficam no mercado local. IPOs compartilhados, eventos globais e negociação multiplayer ainda exigem um mercado no servidor.
 - Reiniciar a carreira local não apaga o placar já publicado. Publique novamente para atualizá-lo. O dono pode remover uma conta e seus dados por **Supabase → Authentication → Users → Delete user**; tabelas usam exclusão em cascata.
 - Testes locais verificam a migração e isolamento entre membros com PostgreSQL embarcado (PGlite). A ativação real, confirmação de e-mail e envio SMTP precisam ser conferidos depois de configurar seu projeto.
+
+## Convites durante a confirmação de e-mail
+
+O site agora aceita tanto o código quanto o link completo de convite no formulário. O código pendente fica guardado por até sete dias neste navegador, de forma que você pode confirmar o e-mail, voltar e entrar na liga depois. A entrada sempre exige confirmação no botão do formulário; login não inscreve ninguém automaticamente.
+
+O retorno do cadastro inclui a URL do Pages e, quando houver, o parâmetro `clube`. Se quiser preservar o link completo em confirmações abertas em outro dispositivo, confira que a allowlist de Redirect URLs do Supabase aceita a rota de retorno com query (por exemplo, o padrão específico do projeto `https://kvzinncpx7.github.io/BOSTA3/**`). A aplicação não altera essa configuração automaticamente. No mesmo navegador, o convite local continua disponível mesmo se o serviço retornar à Site URL sem a query.
+
+O aviso de confirmação é limpo após autenticação, inclusive com respostas atrasadas do cadastro. Nenhum esquema SQL ou política RLS adicional é necessário para essas correções. Recordes, chat de NPCs e segredos continuam locais; os campos enviados ao ranking existente permanecem os mesmos.

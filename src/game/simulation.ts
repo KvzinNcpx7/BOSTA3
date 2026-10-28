@@ -1,3 +1,4 @@
+import { callMeeting, expireFun } from "./meetings";
 import { award, tick, wealth, type Game, type News } from "./engine";
 import { currentCareer } from "./career";
 import {
@@ -30,28 +31,34 @@ export function triggerSpecial(
   const impacts: Record<string, number> = {};
   g.assets.forEach((a, i) => {
     impacts[a.symbol] =
-      kind === "iararara"
-        ? rounded((i % 2 ? -0.12 : 0.22) + (rng() - 0.5) * 0.08)
-        : kind === "erika"
-          ? a.symbol === "FOFO3"
-            ? 0.12
+      kind === "irineu"
+        ? a.symbol === "FOFO3"
+          ? 0.05
+          : a.symbol === "TIGR3"
+            ? rounded((rng() - 0.5) * 0.12)
             : 0
-          : kind === "priscila"
-            ? (
-                {
-                  FOFO3: 0.14,
-                  BOLO4: 0.1,
-                  POMBO3: 0.08,
-                  CLT4: -0.06,
-                } as Record<string, number>
-              )[a.symbol] || 0
-            : kind === "cantina"
-              ? a.symbol === "BOLO4"
-                ? -0.22
-                : a.symbol === "SONO3"
-                  ? 0.07
-                  : -0.06
-              : 0;
+        : kind === "iararara"
+          ? rounded((i % 2 ? -0.12 : 0.22) + (rng() - 0.5) * 0.08)
+          : kind === "erika"
+            ? a.symbol === "FOFO3"
+              ? 0.12
+              : 0
+            : kind === "priscila"
+              ? (
+                  {
+                    FOFO3: 0.14,
+                    BOLO4: 0.1,
+                    POMBO3: 0.08,
+                    CLT4: -0.06,
+                  } as Record<string, number>
+                )[a.symbol] || 0
+              : kind === "cantina"
+                ? a.symbol === "BOLO4"
+                  ? -0.22
+                  : a.symbol === "SONO3"
+                    ? 0.07
+                    : -0.06
+                : 0;
   });
   const assets = g.assets.map((a) => {
     const price = Math.max(0.01, rounded(a.price * (1 + impacts[a.symbol])));
@@ -102,7 +109,7 @@ export function advanceMarket(
   rng = Math.random,
   now = Date.now(),
 ): Game {
-  let next = finishSpecial(g, now);
+  let next = expireFun(finishSpecial(g, now), now);
   if (manual) {
     const c = currentCareer(next.career);
     next = {
@@ -147,12 +154,22 @@ export function advanceMarket(
     ? chooseEvent(prefs.school, next.resenha.recentEvents, rng, erika)
     : undefined;
   const stepped = tick(next, rng, index, new Date(now).getDay(), !manual, now);
-  return scheduled
+  const result = scheduled
     ? {
         ...stepped,
         resenha: { ...stepped.resenha, nextNewsTick: stepped.career.ticks + 5 },
       }
     : stepped;
+  if (
+    scheduled &&
+    prefs.extraordinary &&
+    !result.fun.meeting &&
+    !activeSpecial(result.resenha, now) &&
+    (!result.fun.lastMeetingAt || now - result.fun.lastMeetingAt >= 180000) &&
+    rng() < 0.06
+  )
+    return callMeeting(result, now, rng);
+  return result;
 }
 export function recordShare(g: Game, n: News): Game {
   const key = `${n.id}:${n.title}`;
