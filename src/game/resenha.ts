@@ -55,6 +55,7 @@ export function freshResenha(): ResenhaState {
       hipotetico: 0,
       painho: 0,
       taxad: 0,
+      cavaleiros: 0,
     },
     completed: [],
     recentEvents: [],
@@ -121,7 +122,8 @@ export function chooseEvent(
   return pool[Math.min(pool.length - 1, Math.floor(rng() * pool.length))].id;
 }
 export function chooseSpecial(school: boolean, rng = Math.random): SpecialKind {
-  const pool = specialEvents.filter((s) => school || !s.school);
+  if (rng() >= 0.99) return "cavaleiros";
+  const pool = specialEvents.filter((s) => s.id !== "painho" && s.id !== "cavaleiros" && (school || !s.school));
   return pool[Math.min(pool.length - 1, Math.floor(rng() * pool.length))].id;
 }
 export function activeSpecial(r: ResenhaState, now = Date.now()) {

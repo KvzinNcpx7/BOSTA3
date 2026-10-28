@@ -401,7 +401,7 @@ export const newHeadlines: Headline[] = [
   // Append new parody events so every published news ID remains stable.
   ...politicalParodies.map(([symbol, title, impact]) => ({
     symbol,
-    title,
+    title: `SÁTIRA FICTÍCIA · ${title}`,
     impact,
     school: false,
   })),
@@ -417,7 +417,8 @@ export type SpecialKind =
   | "vorcaro"
   | "hipotetico"
   | "painho"
-  | "taxad";
+  | "taxad"
+  | "cavaleiros";
 export const specialEvents: {
   id: SpecialKind;
   name: string;
@@ -519,7 +520,7 @@ export const specialEvents: {
     school: false,
     duration: 9000,
     description: "E SE o mercado só negociasse possibilidades? A corretora respondeu com um gráfico que sobe e desce ao mesmo tempo.",
-    consequence: "As ações alternam altas e quedas de 8%. Cenário puramente imaginário.",
+    consequence: "Cada ação recebe um cenário aleatório de alta ou queda entre 4% e 12%. Cenário puramente imaginário.",
   },
   {
     id: "painho",
@@ -538,6 +539,12 @@ export const specialEvents: {
     duration: 9000,
     description: "O ministro fictício da Receita Imaginária decidiu taxar até o espaço vazio entre dois cliques.",
     consequence: "CLT4 cai 8%, BOLO4 cai 6% e FOFO3 sobe 7% com o vazamento do novo formulário.",
+  },
+  {
+    id: "cavaleiros", name: "REUNIÃO DOS 4 CAVALEIROS DO PREJUÍZO!", emoji: "🐎",
+    school: false, duration: 14000,
+    description: "SÁTIRA FICTÍCIA · Vorcaro apresenta o balanço em coxinhas. Bolsonaro Hipotético pergunta E SE? Painho pede tudo. Taxad anuncia a taxa de participação. Irineu: IRINEU, VOCÊ NÃO SABE NEM EU!",
+    consequence: "CARAI BORRACHA! ESSA REUNIÃO CUSTOU 3 TRILHÕES DE REAIS FICTÍCIOS! Só as cotações reagem: nenhum débito no caixa. POMBO3 e FOFO3 sobem; CLT4 e BOLO4 recuam.",
   },
 ];
 export const resenhaAchievements = [
