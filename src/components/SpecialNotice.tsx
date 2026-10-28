@@ -6,10 +6,12 @@ export function SpecialNotice({
   active,
   now,
   effects,
+  displayedWealth,
 }: {
   active: NonNullable<ResenhaState["active"]>;
   now: number;
   effects: boolean;
+  displayedWealth?: number;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const event = specialEvents.find((e) => e.id === active.kind)!;
@@ -34,6 +36,12 @@ export function SpecialNotice({
           {!collapsed && (
             <>
               <p>{event.description}</p>
+              {event.id === "painho" && (
+                <div className="confisco-pegadinha" aria-label="Confisco cenográfico: o patrimônio real do jogo está intacto">
+                  <strong>SEU PATRIMÔNIO: R$ 0,00 💀</strong>
+                  <span>PEGADINHA! Seu patrimônio verdadeiro no jogo continua {typeof displayedWealth === "number" ? displayedWealth.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "preservado"}. Nada foi retirado.</span>
+                </div>
+              )}
               <small>{event.consequence}</small>
             </>
           )}
