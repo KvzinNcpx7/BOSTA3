@@ -22,7 +22,9 @@ import { money, type Game } from "../game/engine";
 export function SocialPanel({
   game,
   notify,
+  accountOnly = false,
 }: {
+  accountOnly?: boolean;
   game: Game;
   notify: (s: string) => void;
 }) {
@@ -80,7 +82,7 @@ export function SocialPanel({
     setGroups([]);
     setRows([]);
     setSelected("");
-    if (session)
+    if (session && !accountOnly)
       clubs()
         .then((v) => {
           if (live) {
@@ -94,7 +96,7 @@ export function SocialPanel({
     return () => {
       live = false;
     };
-  }, [session?.user.id]);
+  }, [session?.user.id, accountOnly]);
   useEffect(() => {
     let live = true;
     setRows([]);
@@ -170,7 +172,7 @@ export function SocialPanel({
         <div className="panel-heading">
           <div>
             <h2>
-              <Users size={18} /> Clube do Boleto
+              <Users size={18} /> {accountOnly ? "Minha conta BOSTA3" : "Clube do Boleto"}
             </h2>
             <p>Porque passar vergonha em grupo tem desconto emocional.</p>
           </div>
@@ -261,8 +263,7 @@ export function SocialPanel({
                   : "Criar minha conta"}
             </button>
             <p className="form-help">
-              A conta identifica você nas ligas. Sua carteira continua neste
-              navegador; não há sincronização de saves.
+              Use a mesma conta no PC e no celular. Em Minha carreira, ative o save na nuvem para continuar seu jogo em outro aparelho.
             </p>
           </form>
         ) : (
@@ -270,7 +271,7 @@ export function SocialPanel({
             <p className="account-status">
               🪪 Sócio autenticado: <strong>{session.user.email}</strong>
             </p>
-            <button
+            {!accountOnly && <><button
               className="primary-button full"
               disabled={busy}
               onClick={() =>
@@ -288,7 +289,7 @@ export function SocialPanel({
             <p className="form-help">
               Publica seu nome de pregão, avatar, cargo, patrimônio e XP para
               membros das suas ligas. Você decide quando atualizar.
-            </p>
+            </p></>}
             <button
               className="trade-button"
               disabled={busy}
@@ -311,7 +312,7 @@ export function SocialPanel({
           </p>
         )}
       </section>
-      {session && (
+      {session && !accountOnly && (
         <>
           <section className="panel league-tools">
             <div className="panel-heading">

@@ -31,7 +31,7 @@ Abra a URL impressa pelo Vite, com o caminho `/BOSTA3/`.
 - A carteira mostra quantidade, preço médio ponderado, valor atual e resultado. O dashboard contabiliza saldo mais posições, e lucro/prejuízo em relação aos R$ 10.000 iniciais.
 - Desbloqueie sete conquistas, acompanhe o Jornal do Caos e os comentários do Primo do Primo.
 - O ícone de pausa suspende a simulação automática; operações e caos manual continuam disponíveis.
-- Progresso salvo automaticamente no `localStorage` deste navegador. Não existe sincronização entre dispositivos. Não há simulação retroativa com a página fechada; abas em segundo plano podem ter timers limitados pelo navegador.
+- Progresso salvo automaticamente no `localStorage` deste navegador. A sincronização privada entre dispositivos pode ser ativada em Minha carreira após configurar a migração 002 do Supabase. Não há simulação retroativa com a página fechada; abas em segundo plano podem ter timers limitados pelo navegador.
 - **Reiniciar minha carreira** pede confirmação antes de apagar o progresso. No celular, ajuda e reinício também estão disponíveis no menu do terminal (botões no cabeçalho).
 
 ## Verificar
@@ -52,7 +52,7 @@ Vitest testa saldo inicial, compras, preço médio, vendas, prejuízo realizado,
 - `src/App.tsx`: terminal e telas de mercado, carteira, notícias e conquistas.
 - `src/style.css`: Tailwind CSS, identidade visual e layouts responsivos.
 
-O motor de jogo continua no navegador. A integração opcional com Supabase cuida de identidade e ligas; não valida negociações. O estado local não deve ser usado como fonte confiável para competições ou rankings com premiação.
+O motor de jogo continua no navegador. A integração opcional com Supabase cuida de identidade, saves privados e ligas; não valida negociações. O estado local não deve ser usado como fonte confiável para competições ou rankings com premiação.
 
 ## Publicar no GitHub Pages
 
@@ -62,7 +62,7 @@ Não há rotas de servidor: a navegação é feita no próprio app, sem necessid
 
 ## Expansão: carreiras, empresas e ligas
 
-- **Minha carreira**: cartão de investidor com nome, avatar, cargo, sede, cor e bio; gerador de identidade absurda; nível por XP. Perfil salvo localmente.
+- **Minha carreira**: cartão de investidor com nome, avatar, cargo, sede, cor e bio; gerador de identidade absurda; nível por XP. Perfil salvo localmente e incluído no save privado quando a nuvem é ativada.
 - **Missões diárias**: três objetivos com dinheiro fictício e XP, resgate único por missão/dia. Os contadores reiniciam no dia local do navegador. Alterar o relógio ou o save pode afetá-los; não são mecanismos de competição verificada.
 - **Dividendos**: a cada 60 ticks automáticos (cerca de cinco minutos em primeiro plano), posições pagam 0,2% do valor atual, até R$ 500 por rodada. Pausar interrompe o relógio. Caos manual não acelera pagamentos.
 - **Extrato**: últimas 100 compras, vendas, dividendos, recompensas e aberturas de empresa. Operações feitas na versão anterior não podem ser reconstruídas.
@@ -70,7 +70,7 @@ Não há rotas de servidor: a navegação é feita no próprio app, sem necessid
 - **Clube do Boleto**: cadastro/login por e-mail, ligas por convite e ranking recreativo de patrimônio declarado. Implementado com Supabase, mas precisa da configuração descrita em [docs/SUPABASE.md](docs/SUPABASE.md) para ser ativado. Sem configuração, a tela informa a indisponibilidade e o jogo local funciona.
 - Saves da primeira versão são migrados automaticamente, preservando carteira e saldo. A chave histórica do jogo original é mantida.
 
-**Não há sincronização de carteira, mercado multiplayer nem validação de resultados no servidor.** As contas identificam os participantes das ligas; os placares são publicados pelo próprio jogador, não automaticamente.
+**Há sincronização opcional de carteira privada; mercado multiplayer e validação de resultados no servidor continuam fora do escopo.** As contas identificam os participantes das ligas; os placares são publicados pelo próprio jogador, não automaticamente.
 
 ## Testes da expansão
 
@@ -78,7 +78,7 @@ Não há rotas de servidor: a navegação é feita no próprio app, sem necessid
 
 ## Próximas versões
 
-Mercado compartilhado e operações verificadas pelo servidor, sincronização de saves entre dispositivos, IPOs entre jogadores, eventos globais e competições. A versão atual suporta empresas locais e ligas recreativas, sem premiação ou dinheiro real.
+Mercado compartilhado e operações verificadas pelo servidor, IPOs entre jogadores, eventos globais e competições. A versão atual suporta empresas locais e ligas recreativas, sem premiação ou dinheiro real.
 
 ## Modo Resenha Escolar 💀 (v2.1)
 
@@ -128,7 +128,7 @@ A atualização continua na mesma PR do Modo Resenha e **não publica nem faz me
 
 - **Zap dos Acionistas**: NPCs locais reagem a operações, notícias, crises e assembleias. Até 40 mensagens são salvas por carreira; há variação sem repetição consecutiva e os personagens escolares respeitam o modo opcional. Irineu, Primo do Primo, Fiscal do Serasa Fictício e CEOs não são pessoas conversando de verdade. Nenhuma mensagem é enviada para outros jogadores ou serviços.
 - **Assembleia**: três pautas com quatro decisões cada. O jogador escolhe uma proposta, revisa os efeitos e confirma o voto. As opções alteram cotações diferentes; não debitam caixa nem alteram quantidades. Só um voto é aceito por convocação. Prazo de cinco minutos, intervalo de três minutos e recusa/expiração sem decisão oculta. Assembleias podem aparecer nas rodadas com notícia (6%, com extraordinários habilitados) ou ser convocadas explicitamente.
-- **Recordes**: maior lucro e prejuízo patrimonial observados em relação aos R$ 10 mil iniciais, crises/extraordinários, operações, segredos e conquistas. Tudo permanece local; nenhum campo novo é enviado às ligas. Na migração de saves antigos, usamos somente os dados ainda disponíveis, sem inventar o histórico perdido.
+- **Recordes**: maior lucro e prejuízo patrimonial observados em relação aos R$ 10 mil iniciais, crises/extraordinários, operações, segredos e conquistas. Os recordes fazem parte do save privado opcional; nenhum campo novo é enviado às ligas. Na migração de saves antigos, usamos somente os dados ainda disponíveis, sem inventar o histórico perdido.
 - **Comprovante de Vergonha**: prévia, download PNG de 1200 × 1500 e compartilhamento de arquivo quando suportado pelo navegador. O card usa apelido fictício revisável (começa genérico), patrimônio, máximas de lucro/prejuízo, título, selo e frase sorteada. Nunca lê e-mail, sessão, token ou convite. Validação recusa contatos e links no apelido. O resultado é uma captura do momento da geração; ao regenerar ou sair, URLs temporárias são liberadas.
 
 ### Plantão Bosta News e o Fiscal
@@ -179,3 +179,10 @@ oculta a pegadinha imediatamente. Recarregar descarta a pegadinha.
 A branch `feat/trio-resenha-banco-caos` conserva os commits preliminares, com
 correções posteriores. O workflow valida pull requests; publicação apenas após
 merge aprovado em main. Nenhuma migração de banco é necessária.
+
+
+### Conta e carreira entre aparelhos
+
+O login Supabase existente também está disponível em **Minha carreira**. A carreira privada pode ser enviada à conta e recuperada no PC ou celular, com salvamento automático a cada 15 segundos após escolha explícita, botão Salvar agora, backups locais antes de substituir e proteção atômica contra saves concorrentes. Não combina carteiras nem publica rankings automaticamente.
+
+**Ativação necessária:** instalar a migração aditiva `supabase/migrations/002_private_cloud_saves.sql` no mesmo projeto, após a 001. As duas variáveis públicas existentes são suficientes; não há chave privada no site. Passo a passo em [docs/SUPABASE.md](docs/SUPABASE.md). Sem migração, a interface explica o que falta e preserva o jogo local.

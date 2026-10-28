@@ -3367,3 +3367,12 @@ footer > span {
 .horsemen-motion { animation: horsemen-arrive .35s ease-out; }
 @keyframes horsemen-arrive { from { opacity: .2; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .horsemen-motion { animation: none; } }
+.cloud-career { padding: 18px; margin: 18px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.cloud-career > div:first-child { flex: 1 1 260px; }
+.cloud-career h2 { font-size: 16px; margin: 0 0 6px; }
+.cloud-career p { font-size: 12px; line-height: 1.7; color: #b9c2ba; margin: 0; overflow-wrap: anywhere; }
+.cloud-career > p, .cloud-choices { flex-basis: 100%; }
+.cloud-choices { display: flex; flex-wrap: wrap; gap: 10px; }
+.cloud-choices > p { flex-basis: 100%; }
+.cloud-career button { white-space: normal; }
+@media(max-width: 600px) { .cloud-career button { width: 100%; } }
