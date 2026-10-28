@@ -1,0 +1,300 @@
+{
+  "events": [
+    {
+      "id": 0,
+      "symbol": "POMBO3",
+      "title": "Pombo assume presidência da companhia após vencer votação por 3 migalhas.",
+      "impact": 0.12
+    },
+    {
+      "id": 1,
+      "symbol": "CALV3",
+      "title": "CEO é visto comprando shampoo. Investidores entram em pânico.",
+      "impact": -0.14
+    },
+    {
+      "id": 2,
+      "symbol": "CLT4",
+      "title": "Pesquisa confirma: ninguém quer trabalhar segunda-feira.",
+      "impact": -0.1
+    },
+    {
+      "id": 3,
+      "symbol": "FOFO3",
+      "title": "Print de grupo da firma vaza. Fofoca bate recorde de audiência.",
+      "impact": 0.16
+    },
+    {
+      "id": 4,
+      "symbol": "TIGR3",
+      "title": "Tigrinho anuncia que agora vai. Mercado acredita de novo.",
+      "impact": 0.18
+    },
+    {
+      "id": 5,
+      "symbol": "WEBN3",
+      "title": "Casal volta pela oitava vez. Analistas chamam de recuperação em W.",
+      "impact": 0.12
+    },
+    {
+      "id": 6,
+      "symbol": "SONO3",
+      "title": "Professor cancela a primeira aula. País volta a sonhar.",
+      "impact": 0.13
+    },
+    {
+      "id": 7,
+      "symbol": "BOLO4",
+      "title": "Bolo de pote recebe aporte de duas tias e um vizinho.",
+      "impact": 0.14
+    },
+    {
+      "id": 8,
+      "symbol": "POMBO3",
+      "title": "Avião desvia rota ao avistar um pacote de biscoitos.",
+      "impact": -0.09
+    },
+    {
+      "id": 9,
+      "symbol": "CALV3",
+      "title": "Boné vira item de luxo. Carecas celebram dividendos.",
+      "impact": 0.11
+    },
+    {
+      "id": 10,
+      "symbol": "CLT4",
+      "title": "Reunião que poderia ser e-mail dura três horas.",
+      "impact": -0.08
+    },
+    {
+      "id": 11,
+      "symbol": "FOFO3",
+      "title": "Áudio de sete minutos chega com “você não sabe da maior”.",
+      "impact": 0.1
+    },
+    {
+      "id": 12,
+      "symbol": "TIGR3",
+      "title": "Mascote aperta o botão errado. Nem a auditoria entendeu.",
+      "impact": -0.22
+    },
+    {
+      "id": 13,
+      "symbol": "WEBN3",
+      "title": "“Quem é essa pessoa curtindo sua foto?” abala o setor.",
+      "impact": -0.16
+    },
+    {
+      "id": 14,
+      "symbol": "SONO3",
+      "title": "Vizinho compra furadeira. Mercado do descanso desaba.",
+      "impact": -0.12
+    },
+    {
+      "id": 15,
+      "symbol": "BOLO4",
+      "title": "Colher vendida separadamente causa revolta entre acionistas.",
+      "impact": -0.08
+    },
+    {
+      "id": 16,
+      "symbol": "POMBO3",
+      "title": "Nova classe executiva oferece migalhas integrais.",
+      "impact": 0.08
+    },
+    {
+      "id": 17,
+      "symbol": "CALV3",
+      "title": "Estudo fictício: cabeça brilhante reduz conta de iluminação.",
+      "impact": 0.13
+    },
+    {
+      "id": 18,
+      "symbol": "CLT4",
+      "title": "Feriado cai na quinta. Ponte impulsiona felicidade nacional.",
+      "impact": 0.15
+    },
+    {
+      "id": 19,
+      "symbol": "FOFO3",
+      "title": "Fonte diz que fonte não é confiável. Mercado pede mais detalhes.",
+      "impact": -0.09
+    },
+    {
+      "id": 20,
+      "symbol": "TIGR3",
+      "title": "Tigrinho troca diretor financeiro por um dado de vinte lados.",
+      "impact": -0.13
+    },
+    {
+      "id": 21,
+      "symbol": "WEBN3",
+      "title": "Passagem de ônibus em promoção aproxima dois corações.",
+      "impact": 0.14
+    },
+    {
+      "id": 22,
+      "symbol": "SONO3",
+      "title": "Chuva e cobertor formam joint venture histórica.",
+      "impact": 0.11
+    },
+    {
+      "id": 23,
+      "symbol": "BOLO4",
+      "title": "Pote quadrado promete disrupção no setor de potes redondos.",
+      "impact": 0.12
+    },
+    {
+      "id": 24,
+      "symbol": "POMBO3",
+      "title": "CEO fica preso na varanda. Assembleia é adiada.",
+      "impact": -0.12
+    },
+    {
+      "id": 25,
+      "symbol": "CALV3",
+      "title": "Vento forte derruba concorrência de perucas.",
+      "impact": 0.09
+    },
+    {
+      "id": 26,
+      "symbol": "CLT4",
+      "title": "Firma anuncia pizza no lugar de aumento. Mercado digere mal.",
+      "impact": -0.11
+    },
+    {
+      "id": 27,
+      "symbol": "FOFO3",
+      "title": "Grupo silenciado há um ano acumula 8 mil mensagens.",
+      "impact": 0.08
+    },
+    {
+      "id": 28,
+      "symbol": "TIGR3",
+      "title": "Homem compra porque gráfico estava verde. Especialistas preocupados.",
+      "impact": 0.07
+    },
+    {
+      "id": 29,
+      "symbol": "WEBN3",
+      "title": "Wi-fi cai durante pedido de namoro. Romance entra em manutenção.",
+      "impact": -0.1
+    },
+    {
+      "id": 30,
+      "symbol": "SONO3",
+      "title": "País aprova informalmente a sesta depois do almoço.",
+      "impact": 0.12
+    },
+    {
+      "id": 31,
+      "symbol": "BOLO4",
+      "title": "CEO come estoque durante live. Previsão de receita revisada.",
+      "impact": -0.15
+    },
+    {
+      "id": 32,
+      "symbol": "ALL",
+      "title": "Banco Central do Caos eleva juros a 200% após café esfriar.",
+      "impact": -0.07
+    },
+    {
+      "id": 33,
+      "symbol": "ALL",
+      "title": "Mercado descobre que dinheiro é fictício e respira aliviado.",
+      "impact": 0.06
+    },
+    {
+      "id": 34,
+      "symbol": "CALV3",
+      "title": "CALV3 lança assinatura de pente. Mercado pede perícia no público-alvo.",
+      "impact": -0.08
+    },
+    {
+      "id": 35,
+      "symbol": "CLT4",
+      "title": "Empresa troca vale-refeição por palestra sobre abundância. Funcionários mastigam ressentimento.",
+      "impact": -0.12
+    },
+    {
+      "id": 36,
+      "symbol": "TIGR3",
+      "title": "Diretoria contrata um polvo para gerir risco. Polvo pede demissão por falta de braços.",
+      "impact": -0.14
+    },
+    {
+      "id": 37,
+      "symbol": "FOFO3",
+      "title": "Vizinha instala cadeira na calçada. Capacidade de análise fundamentalista triplica.",
+      "impact": 0.15
+    },
+    {
+      "id": 38,
+      "symbol": "POMBO3",
+      "title": "Pombo Airlines cobra bagagem de mão, de asa e de bico. Receita de taxas dispara.",
+      "impact": 0.11
+    },
+    {
+      "id": 39,
+      "symbol": "WEBN3",
+      "title": "Casal divide senha de streaming. Analistas anunciam fusão de alto risco.",
+      "impact": 0.1
+    },
+    {
+      "id": 40,
+      "symbol": "SONO3",
+      "title": "CEO participa da reunião dormindo e entrega o melhor resultado do trimestre.",
+      "impact": 0.13
+    },
+    {
+      "id": 41,
+      "symbol": "BOLO4",
+      "title": "Bolo de pote anuncia versão enterprise: o mesmo bolo, mas com reunião de onboarding.",
+      "impact": 0.12
+    }
+  ],
+  "achievements": [
+    {
+      "id": "first",
+      "name": "Investidor de Centavos",
+      "hint": "Faça sua primeira compra.",
+      "emoji": "🪙"
+    },
+    {
+      "id": "trader",
+      "name": "Lobo de Wall Street de Osasco",
+      "hint": "Realize 20 operações.",
+      "emoji": "🐺"
+    },
+    {
+      "id": "loss",
+      "name": "Warren Buffett ao contrário",
+      "hint": "Tenha prejuízo de R$ 500.",
+      "emoji": "📉"
+    },
+    {
+      "id": "ceo",
+      "name": "CEO do Prejuízo",
+      "hint": "Realize prejuízo acumulado de R$ 1.000.",
+      "emoji": "💀"
+    },
+    {
+      "id": "sellLoss",
+      "name": "Comprou na Alta, Vendeu na Baixa",
+      "hint": "Venda uma posição no prejuízo.",
+      "emoji": "🤡"
+    },
+    {
+      "id": "million",
+      "name": "Milionário de Mentirinha",
+      "hint": "Alcance R$ 1 milhão de patrimônio.",
+      "emoji": "💸"
+    },
+    {
+      "id": "snack",
+      "name": "Patrimônio de um Salgado",
+      "hint": "Fique com patrimônio de até R$ 10.",
+      "emoji": "🥟"
+    }
+  ]
+}

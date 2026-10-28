@@ -8,7 +8,6 @@ import {
   ChartNoAxesCombined,
   ChevronRight,
   CircleHelp,
-  Flame,
   LayoutDashboard,
   Newspaper,
   Pause,
@@ -29,7 +28,7 @@ import {
   BriefcaseBusiness,
   ScrollText,
 } from "lucide-react";
-import { achievements, events } from "./game/data";
+import { achievements } from "./game/data";
 import {
   award,
   fresh,
@@ -37,7 +36,6 @@ import {
   money,
   pct,
   SAVE_KEY,
-  tick,
   trade,
   wealth,
   type Asset,
@@ -49,7 +47,22 @@ import {
   HistoryPanel,
 } from "./components/CareerPanel";
 import { SocialPanel } from "./components/SocialPanel";
-import { currentCareer } from "./game/career";
+import { ResenhaControls } from "./components/ResenhaControls";
+import { SpecialNotice } from "./components/SpecialNotice";
+import { ChaosNews } from "./components/ChaosNews";
+import { useBanter } from "./components/useBanter";
+import { characters } from "./game/banter";
+import {
+  activeSpecial,
+  tradeBlocked,
+  enabledSpecial,
+  loadHumorPreferences,
+  HUMOR_KEY,
+  type HumorPreferences,
+} from "./game/resenha";
+import { specialEvents } from "./game/resenhaContent";
+import { advanceMarket, finishSpecial, recordShare } from "./game/simulation";
+import { unlockSound, playSpecialTone } from "./services/sound";
 type Tab =
   | "Visão geral"
   | "Mercado"
@@ -79,6 +92,40 @@ export default function App() {
       : "Visão geral",
   );
   const [paused, setPaused] = useState(false);
+  const [preferences, setPreferences] = useState(() => ({
+    ...loadHumorPreferences(),
+    sound: false,
+  }));
+  const [humorSaveFailed, setHumorSaveFailed] = useState(false);
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        HUMOR_KEY,
+        JSON.stringify({ ...preferences, sound: false }),
+      );
+      setHumorSaveFailed(false);
+    } catch {
+      setHumorSaveFailed(true);
+    }
+  }, [preferences]);
+  useEffect(() => {
+    if (!game.resenha.active) return;
+    setNow(Date.now());
+    const clock = setInterval(() => {
+      setNow(Date.now());
+      setGame((g) => finishSpecial(g));
+    }, 500);
+    return () => clearInterval(clock);
+  }, [game.resenha.active?.startedAt]);
+  const seenSpecial = useRef(game.resenha.active?.startedAt);
+  useEffect(() => {
+    const start = game.resenha.active?.startedAt;
+    if (start && seenSpecial.current !== start) {
+      seenSpecial.current = start;
+      playSpecialTone(preferences.sound);
+    }
+  }, [game.resenha.active?.startedAt, preferences.sound]);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [side, setSide] = useState<"buy" | "sell">("buy");
@@ -99,21 +146,12 @@ export default function App() {
   }, [game]);
   useEffect(() => {
     if (paused) return;
-    let count = 0;
-    const timer = setInterval(() => {
-      count++;
-      setGame((g) =>
-        tick(
-          g,
-          Math.random,
-          count % 5 === 0
-            ? Math.floor(Math.random() * events.length)
-            : undefined,
-        ),
-      );
-    }, 5000);
+    const timer = setInterval(
+      () => setGame((g) => advanceMarket(g, preferences)),
+      5000,
+    );
     return () => clearInterval(timer);
-  }, [paused]);
+  }, [paused, preferences.school, preferences.extraordinary]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 5000);
@@ -147,24 +185,40 @@ export default function App() {
   const asset = game.assets.find((a) => a.symbol === selected);
   const holding = asset ? game.positions[asset.symbol] : undefined;
   const notify = (text: string) => setToast(text);
-  const chaos = () => {
-    const i = Math.floor(Math.random() * events.length);
-    setGame((g) => {
-      const c = currentCareer(g.career);
-      return tick(
-        {
-          ...g,
-          career: { ...c, daily: { ...c.daily, chaos: c.daily.chaos + 1 } },
-        },
-        Math.random,
-        i,
-        new Date().getDay(),
-        false,
+  const { comment, say } = useBanter(game, preferences.school, notify);
+  const speaker = characters[comment.speaker];
+  const eventNow = Math.max(now, game.resenha.active?.startedAt || 0);
+  const featured = activeSpecial(game.resenha, eventNow);
+  const blocked = tradeBlocked(game.resenha, eventNow);
+  const visibleAchievements = achievements.filter(
+    (a) => preferences.school || !a.school,
+  );
+  const visibleUnlocked = visibleAchievements.filter((a) =>
+    game.unlocked.includes(a.id),
+  ).length;
+  const changePreference = async (
+    key: keyof HumorPreferences,
+    value: boolean,
+  ) => {
+    if (key === "sound" && value && !(await unlockSound())) {
+      notify(
+        "Este navegador não liberou o áudio. Os alertas continuam na tela.",
       );
-    });
-    notify(
-      `⚡ ${events[i].symbol}: ${pct(events[i].impact * 100)} de impacto. O caos foi servido.`,
-    );
+      return;
+    }
+    const next = { ...preferences, [key]: value };
+    setPreferences(next);
+    if (key === "school" || key === "extraordinary")
+      setGame((g) => ({ ...g, resenha: enabledSpecial(g.resenha, next) }));
+    if (key === "school")
+      notify(
+        value
+          ? "Modo Resenha Escolar: o pregão entrou no grupo."
+          : "Modo brasileiro geral: o grupo ficou no silencioso.",
+      );
+  };
+  const chaos = () => {
+    setGame((g) => advanceMarket(g, preferences, true));
   };
   const openTrade = (a: Asset, s: "buy" | "sell" = "buy") => {
     setSelected(a.symbol);
@@ -225,7 +279,9 @@ export default function App() {
               <span>{n.name}</span>
               {n.name === "Jornal do Caos" && <span className="nav-dot" />}
               {n.name === "Conquistas" && (
-                <small>{game.unlocked.length}/7</small>
+                <small>
+                  {visibleUnlocked}/{visibleAchievements.length}
+                </small>
               )}
             </button>
           ))}
@@ -345,6 +401,23 @@ export default function App() {
               <ArrowUpRight size={16} />
             </button>
           </section>
+          <ResenhaControls
+            preferences={preferences}
+            onChange={changePreference}
+          />
+          {humorSaveFailed && (
+            <div className="save-warning" role="alert">
+              A preferência de humor não pôde ser salva. Ela vale nesta sessão.
+            </div>
+          )}
+          {featured && (
+            <SpecialNotice
+              key={featured.startedAt}
+              active={featured}
+              now={eventNow}
+              effects={preferences.effects}
+            />
+          )}
           {saveFailed && (
             <div className="save-warning" role="alert">
               Não foi possível salvar neste navegador. Seu progresso desta
@@ -474,24 +547,22 @@ export default function App() {
                   <span className="online-dot" />
                 </div>
                 <div className="advisor-person">
-                  <div className="advisor-portrait">🥸</div>
+                  <div className="advisor-portrait">{speaker.emoji}</div>
                   <div>
-                    <h3>Primo do Primo</h3>
-                    <p>Especialista em quase tudo</p>
-                    <span>CNPI: confia no pai, investidor</span>
+                    <h3>{speaker.name}</h3>
+                    <p>{speaker.job}</p>
+                    <span>{speaker.credential}</span>
                   </div>
                 </div>
-                <blockquote>
-                  “
-                  {game.trades === 0
-                    ? "Dinheiro parado não perde dinheiro. Mas também não rende história pra contar no churrasco."
-                    : profit < 0
-                      ? "Você não perdeu dinheiro. Investiu em desenvolvimento de personagem."
-                      : profit > 100
-                        ? "Tá no lucro? Cuidado. O mercado pode perceber e corrigir esse erro."
-                        : "Diversificar é perder dinheiro em várias empresas ao mesmo tempo. Você pegou o espírito."}
-                  ”
-                </blockquote>
+                <blockquote>“{comment.text}”</blockquote>
+                <button
+                  className="text-button"
+                  onClick={() =>
+                    say(profit < 0 ? "loss" : profit > 100 ? "gain" : "welcome")
+                  }
+                >
+                  Solicitar outro parecer questionável ↗
+                </button>
                 <div className="advisor-foot">
                   <span className="lime">✦</span> Zero certificações. Muita
                   convicção.
@@ -699,86 +770,33 @@ export default function App() {
             </section>
           )}
           {(tab === "Visão geral" || tab === "Jornal do Caos") && (
-            <section className="news-section">
-              <div className="section-heading">
-                <div>
-                  <div className="eyebrow">
-                    <span className="live-dot" /> PLANTÃO DO ABSURDO
-                  </div>
-                  <h2>
-                    Jornal do Caos<span className="muted">.</span>
-                  </h2>
-                </div>
-                {tab === "Visão geral" && (
-                  <button
-                    className="text-button"
-                    onClick={() => setTab("Jornal do Caos")}
-                  >
-                    Todas as notícias <ArrowRight size={15} />
-                  </button>
-                )}
-              </div>
-              <div className="news-grid">
-                {game.news
-                  .slice(0, tab === "Visão geral" ? 3 : 40)
-                  .map((n, i) => (
-                    <article className="news-card" key={`${n.time}-${i}`}>
-                      <div className="news-meta">
-                        <span>
-                          {n.symbol === "ALL"
-                            ? "MACROECONOMIA DO DELÍRIO"
-                            : n.symbol}
-                        </span>
-                        <small>
-                          {new Date(n.time).toLocaleTimeString("pt-BR", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </small>
-                      </div>
-                      <h3>{n.title}</h3>
-                      <div className="news-impact">
-                        <span
-                          className={n.impact >= 0 ? "positive" : "negative"}
-                        >
-                          {n.impact >= 0 ? (
-                            <TrendingUp size={14} />
-                          ) : (
-                            <TrendingDown size={14} />
-                          )}{" "}
-                          Impacto: {pct(n.impact * 100)}
-                        </span>
-                        <span>FONTE: CONFIA</span>
-                      </div>
-                    </article>
-                  ))}
-                {tab === "Visão geral" && game.news.length < 3 && (
-                  <article className="news-card news-placeholder">
-                    <Flame size={26} />
-                    <h3>O próximo surto está sendo apurado.</h3>
-                    <p>
-                      O mercado muda sozinho. Ou você pode dar uma ajudinha.
-                    </p>
-                    <button className="text-button lime" onClick={chaos}>
-                      Gerar uma manchete <ArrowRight size={15} />
-                    </button>
-                  </article>
-                )}
-              </div>
-            </section>
+            <ChaosNews
+              news={game.news}
+              school={preferences.school}
+              full={tab === "Jornal do Caos"}
+              onChaos={chaos}
+              onAll={() => setTab("Jornal do Caos")}
+              onShared={(n) => setGame((g) => recordShare(g, n))}
+              notify={notify}
+            />
           )}
           {tab === "Conquistas" && (
             <>
               <div className="achievement-intro">
                 <Trophy size={30} />
                 <div>
-                  <h2>{game.unlocked.length} de 7 conquistas</h2>
+                  <h2>
+                    {visibleUnlocked} de {visibleAchievements.length} conquistas
+                  </h2>
                   <p>O currículo que nenhuma corretora pediu.</p>
                 </div>
-                <progress value={game.unlocked.length} max={7} />
+                <progress
+                  value={visibleUnlocked}
+                  max={visibleAchievements.length}
+                />
               </div>
               <div className="achievement-grid">
-                {achievements.map((a) => {
+                {visibleAchievements.map((a) => {
                   const unlocked = game.unlocked.includes(a.id);
                   return (
                     <article
@@ -814,8 +832,24 @@ export default function App() {
           {tab === "Extrato" && <HistoryPanel game={game} />}
           <footer>
             <span>
-              <span className="brand-mini">B↘</span> BOSTA3 · A bolsa oficial
-              dos memes brasileiros.
+              <button
+                className="brand-mini"
+                aria-label="Selo de qualidade questionável"
+                onClick={() => {
+                  if (preferences.school)
+                    notify(
+                      "📢 iararara. O departamento de gritos menores agradece sua visita.",
+                    );
+                  else
+                    notify(
+                      "Selo conferido por um pombo independente. Independente de quê, ele não explicou.",
+                    );
+                }}
+              >
+                B↘
+              </button>{" "}
+              BOSTA3 · A bolsa oficial dos memes brasileiros. Aqui o único
+              investimento seguro é na resenha.
             </span>
             <span>
               <ShieldCheck size={13} /> Nenhum real foi prejudicado na criação
@@ -954,8 +988,13 @@ export default function App() {
             <button
               className={`primary-button full ${side === "sell" ? "sell-button" : ""}`}
               onClick={execute}
+              disabled={blocked}
             >
-              {side === "buy" ? "Confirmar compra" : "Confirmar venda"}{" "}
+              {blocked
+                ? `Greve CLT · ${Math.max(0, Math.ceil(((featured?.until || eventNow) - eventNow) / 1000))}s`
+                : side === "buy"
+                  ? "Confirmar compra"
+                  : "Confirmar venda"}{" "}
               <ArrowRight size={17} />
             </button>
             <small className="modal-disclaimer">

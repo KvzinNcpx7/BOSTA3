@@ -1,3 +1,5 @@
+import { useId } from "react";
+import { useReducedMotion } from "./useReducedMotion";
 import {
   Area,
   AreaChart,
@@ -17,6 +19,8 @@ export function Chart({
   color?: string;
   large?: boolean;
 }) {
+  const reduced = useReducedMotion();
+  const gradientId = `chart-${useId().replaceAll(":", "")}`;
   return (
     <ResponsiveContainer width="100%" height={large ? 230 : 38}>
       <AreaChart
@@ -29,13 +33,7 @@ export function Chart({
         }}
       >
         <defs>
-          <linearGradient
-            id={large ? "largeFill" : `fill${color.replace("#", "")}`}
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="1"
-          >
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop
               offset="0%"
               stopColor={color}
@@ -77,8 +75,8 @@ export function Chart({
           dataKey="v"
           stroke={color}
           strokeWidth={large ? 2.5 : 1.5}
-          fill={`url(#${large ? "largeFill" : `fill${color.replace("#", "")}`})`}
-          isAnimationActive={large}
+          fill={`url(#${gradientId})`}
+          isAnimationActive={large && !reduced}
         />
       </AreaChart>
     </ResponsiveContainer>
