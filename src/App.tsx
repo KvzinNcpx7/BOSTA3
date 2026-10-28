@@ -1,3 +1,4 @@
+import { PainhoPrank } from "./components/PainhoPrank";
 import { ResenhaHub, type HubTab } from "./components/ResenhaHub";
 import { useSecrets } from "./components/useSecrets";
 import { observeFun } from "./game/fun";
@@ -480,12 +481,14 @@ export default function App() {
               A preferência de humor não pôde ser salva. Ela vale nesta sessão.
             </div>
           )}
+          <PainhoPrank enabled={preferences.extraordinary} sound={preferences.sound} effects={preferences.effects} blocked={!!selected || guide || reset || !!featured} newsKey={`${game.news[0]?.id}:${game.news[0]?.time}`} />
           {featured && (
             <SpecialNotice
               key={featured.startedAt}
               active={featured}
               now={eventNow}
               effects={preferences.effects && !selected && !guide && !reset}
+              displayedWealth={wealth(game)}
             />
           )}
           {game.fun.bulletin &&

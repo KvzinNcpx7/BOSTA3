@@ -1,4 +1,6 @@
+import { horsemen, horsemenLines } from "./horsemen";
 export const npcCharacters = {
+  ...horsemen,
   irineu: {
     name: "Irineu",
     emoji: "🗿",
@@ -396,3 +398,5 @@ export const meetingTemplates: {
     ],
   },
 ];
+
+for (const context of ["buy", "sell", "loss", "gain", "news", "special", "meeting"] as const) chatLines[context].push(...horsemenLines.map(([speaker, text]): [Npc, string] => [speaker, `Sátira fictícia · ${text} · Ativo em pauta: {symbol}.`]));

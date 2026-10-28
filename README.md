@@ -156,3 +156,26 @@ O campo adicional `fun` contém chat, recordes, segredos, atas e alertas locais.
 Os testes cobrem migração, recordes persistidos, mensagens e critérios de segredos, efeitos e voto único nas 12 opções das assembleias, login/convites com respostas atrasadas, privacidade do payload e geração de um PNG real com assinatura e dimensões verificadas. `@napi-rs/canvas` é dependência **apenas de desenvolvimento** para verificar o PNG; no navegador, a aplicação usa Canvas nativo, sem upload ou API de imagens.
 
 Continuam os mesmos comandos `npm test` e `npm run build`, o caminho `/BOSTA3/` e o workflow de validação. Não há migração SQL nova nem mudança destrutiva de banco. Testes de interface usam DOM simulado; envio real de e-mail/compartilhamento nativo depende do serviço e do navegador do jogador.
+
+### Os 4 Cavaleiros do Prejuízo
+
+Sátira fictícia, sem notícias reais ou acusações factuais: Vorcaro do Multiverso,
+Bolsonaro Hipotético, Painho Cumpanheiro e Taxad participam do jornal, Zap,
+reações e plantões. São 14 notícias adicionais e 20 falas, além da ata do quarteto.
+IDs anteriores continuam na mesma ordem. O evento do quarteto corresponde a 1%
+dos sorteios extraordinários (que já são raros), com roteiro em seis etapas.
+Vorcaro, Taxad, cenários hipotéticos e quarteto alteram apenas cotações fictícias.
+Nenhuma taxa debita dinheiro do caixa.
+
+Painho é exclusivamente um componente de apresentação: 1,2% de chance por nova
+notícia, intervalo mínimo de três minutos por sessão, sem iniciar sobre diálogos
+financeiros ou outro plantão. Mostra patrimônio **cenográfico** zero por quatro
+segundos e revela a brincadeira por mais seis. Não recebe o objeto Game, setter,
+cliente Supabase ou dados da conta; não grava no localStorage. A carteira real,
+ordens e comprovantes continuam mostrando valores corretos. Sons continuam
+opcionais; animações respeitam movimento reduzido. Desligar extraordinários
+oculta a pegadinha imediatamente. Recarregar descarta a pegadinha.
+
+A branch `feat/trio-resenha-banco-caos` conserva os commits preliminares, com
+correções posteriores. O workflow valida pull requests; publicação apenas após
+merge aprovado em main. Nenhuma migração de banco é necessária.

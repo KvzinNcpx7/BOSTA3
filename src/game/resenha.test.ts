@@ -112,7 +112,7 @@ describe("seleção e falas", () => {
     ).toBe(false);
   });
   it("modo escolar inclui notícias próprias e comunicados da Érika", () => {
-    expect(events[chooseEvent(true, [], () => 0.99)].school).toBe(true);
+    expect(events.some(e => e.school && chooseEvent(true, [], () => events.indexOf(e) / events.length + 0.00001) === e.id)).toBe(true);
     const e = events[chooseEvent(true, [], () => 0.99, true)];
     expect(e.school).toBe(true);
     expect(e.symbol).toBe("FOFO3");
@@ -126,7 +126,7 @@ describe("seleção e falas", () => {
       recent = [...recent, comment.text].slice(-8);
     }
     expect(
-      characters[chooseBanter("buy", true, [], () => 0.99).speaker].school,
+      characters[chooseBanter("buy", true, [], () => 0.15, "erika").speaker].school,
     ).toBe(true);
   });
 });

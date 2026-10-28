@@ -1,4 +1,6 @@
+import { horsemen, horsemenLines } from "./horsemen";
 export const characters = {
+  ...horsemen,
   primo: {
     name: "Primo do Primo",
     emoji: "🥸",
@@ -250,3 +252,5 @@ export function chooseBanter(
     pool[Math.min(pool.length - 1, Math.floor(rng() * pool.length))];
   return { speaker, text };
 }
+
+for (const context of ["welcome", "buy", "sell", "sellLoss", "loss", "gain", "rich", "event"] as const) entries[context].push(...horsemenLines);

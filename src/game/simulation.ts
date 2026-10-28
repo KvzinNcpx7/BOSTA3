@@ -26,12 +26,21 @@ export function triggerSpecial(
   rng = Math.random,
   now = Date.now(),
 ): Game {
+  if (kind === "painho") return g; // Presentation only; never enters saved game state.
   const definition = specialEvents.find((s) => s.id === kind)!;
   if (g.resenha.cooldownUntil > now || activeSpecial(g.resenha, now)) return g;
   const impacts: Record<string, number> = {};
   g.assets.forEach((a, i) => {
     impacts[a.symbol] =
-      kind === "irineu"
+      kind === "cavaleiros"
+        ? ({ POMBO3: 0.18, FOFO3: 0.14, CLT4: -0.12, BOLO4: -0.09 } as Record<string, number>)[a.symbol] || 0
+        : kind === "taxad"
+        ? ({ CLT4: -0.08, BOLO4: -0.06, FOFO3: 0.07 } as Record<string, number>)[a.symbol] || 0
+        : kind === "vorcaro"
+        ? ({ TIGR3: 0.15, FOFO3: 0.09, BOLO4: -0.05 } as Record<string, number>)[a.symbol] || 0
+        : kind === "hipotetico"
+        ? rounded((rng() < 0.5 ? -1 : 1) * (0.04 + rng() * 0.08))
+        : kind === "irineu"
         ? a.symbol === "FOFO3"
           ? 0.05
           : a.symbol === "TIGR3"

@@ -3321,3 +3321,49 @@ footer > span {
     animation: none;
   }
 }
+
+/* Fictional financial parody, displayed only during the Painho special. */
+.special-painho {
+  border-color: #c38b5d;
+  background: radial-gradient(ellipse at right top, #c38b5d28, transparent), #211912;
+}
+.confisco-pegadinha {
+  margin-top: 12px;
+  border: 1px dashed #e4aa82;
+  padding: 12px 14px;
+  background: #00000045;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.confisco-pegadinha strong {
+  color: #ffd0aa;
+  font-size: clamp(13px, 1.8vw, 21px);
+}
+.confisco-pegadinha span {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #f5e3cd;
+}
+@media (prefers-reduced-motion: reduce) {
+  .special-painho .special-splash { animation: none; }
+}
+
+.painho-prank { border-color: #d7a065; position: relative; overflow: hidden; }
+.painho-prank strong, .painho-prank small { display: block; margin-top: 8px; }
+.painho-prank h2, .special-cavaleiros h2 { overflow-wrap: anywhere; }
+.prank-animated > span { animation: prank-hand 0.8s ease-in-out 3; }
+.special-cavaleiros { border-color: #bb97ff; background: linear-gradient(120deg, #21192e, #111a17); }
+.special-splash { pointer-events: none; }
+@keyframes prank-hand { 50% { transform: rotate(-20deg) translateY(-5px); } }
+@media (max-width: 600px) {
+  .painho-prank { align-items: flex-start; gap: 8px; }
+  .painho-prank h2, .special-cavaleiros h2 { font-size: 14px; }
+  .painho-prank > div { min-width: 0; flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .prank-animated > span { animation: none; } }
+.horsemen-stage { padding: 12px; border-left: 3px solid #b99bff; margin: 10px 0; font-weight: 700; color: #e6d8ff; }
+.horsemen-motion { animation: horsemen-arrive .35s ease-out; }
+@keyframes horsemen-arrive { from { opacity: .2; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .horsemen-motion { animation: none; } }

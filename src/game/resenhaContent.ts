@@ -369,6 +369,22 @@ const school: [string, string, number][] = [
     0.12,
   ],
 ];
+const politicalParodies: [string, string, number][] = [
+  ["FOFO3", "VORCARO DO MULTIVERSO lança um balanço tão bonito que o gráfico pediu autógrafo. Tudo nesta notícia é ficção.", 0.09],
+  ["TIGR3", "Vorcaro entra no pregão com uma planilha de 900 abas. A aba 'explicação' continua carregando.", -0.08],
+  ["BOLO4", "Vorcaro anuncia banco de bolo de pote. O lastro é uma colher emprestada.", 0.10],
+  ["ALL", "BOLSONARO HIPOTÉTICO abre coletiva: 'E SE as ações subissem?' Metade compra e a outra metade pede o PowerPoint.", 0.06],
+  ["CLT4", "Bolsonaro Hipotético propõe semana com oito sextas-feiras. O calendário pede esclarecimentos.", 0.12],
+  ["FOFO3", "Bolsonaro Hipotético pergunta 'E SE?' 37 vezes. Analistas cobram tese por minuto.", -0.06],
+  ["ALL", "PAINHO CUMPANHEIRO chega ao pregão: 'ME DÁ TUDO!' Mas era a conta do Banco Imaginário. O Pix de mentira foi estornado.", -0.07],
+  ["SONO3", "Painho Cumpanheiro confisca todos os travesseiros fictícios. SONO3 convoca CPI do cochilo.", -0.10],
+  ["POMBO3", "Painho Cumpanheiro tenta levar a frota da POMBO3. Os pombos fogem voando. Auditoria encerra o caso.", 0.11],
+  ["CLT4", "TAXAD cria imposto sobre clicar em 'Comprar'. Investidores passam a negociar piscando para o gráfico.", -0.09],
+  ["BOLO4", "Taxad apresenta a taxa do pote sem tampa. Conselho econômico pede a nota fiscal da colher.", -0.11],
+  ["FOFO3", "Taxad anuncia taxação sobre fofoca não declarada. O grupo inteiro manda 'não fui eu'.", 0.08],
+  ["ALL", "O quarteto Vorcaro, Bolsonaro Hipotético, Painho Cumpanheiro e Taxad entra numa reunião. A ata é só 'CARAI BORRACHA!'.", -0.04],
+  ["TIGR3", "Irineu pergunta ao Taxad qual a alíquota do susto. Resposta: 'Você não sabe nem eu!'.", 0.07],
+];
 export const newHeadlines: Headline[] = [
   ...general.map(([symbol, title, impact]) => ({
     symbol,
@@ -382,6 +398,13 @@ export const newHeadlines: Headline[] = [
     impact,
     school: true,
   })),
+  // Append new parody events so every published news ID remains stable.
+  ...politicalParodies.map(([symbol, title, impact]) => ({
+    symbol,
+    title: `SÁTIRA FICTÍCIA · ${title}`,
+    impact,
+    school: false,
+  })),
 ];
 export type SpecialKind =
   | "iararara"
@@ -390,7 +413,12 @@ export type SpecialKind =
   | "priscila"
   | "cantina"
   | "irineu"
-  | "iarPause";
+  | "iarPause"
+  | "vorcaro"
+  | "hipotetico"
+  | "painho"
+  | "taxad"
+  | "cavaleiros";
 export const specialEvents: {
   id: SpecialKind;
   name: string;
@@ -475,6 +503,48 @@ export const specialEvents: {
       "O microfone chegou antes do comunicado. O departamento de ouvidos pediu um intervalo.",
     consequence:
       "Compras e vendas pausam por 5 segundos. As cotações continuam oscilando.",
+  },
+  {
+    id: "vorcaro",
+    name: "VORCARO DO MULTIVERSO ASSUME A PLANILHA",
+    emoji: "📊",
+    school: false,
+    duration: 10000,
+    description: "Esta é uma sátira fictícia: o balanço tem 900 abas e nenhuma explica por que o botão de lucro está piscando.",
+    consequence: "TIGR3 sobe 15%, FOFO3 sobe 9% e BOLO4 cai 5%. Nenhum fato real está sendo relatado.",
+  },
+  {
+    id: "hipotetico",
+    name: "BOLSONARO HIPOTÉTICO ABRE O DEBATE DO E SE",
+    emoji: "🤔",
+    school: false,
+    duration: 9000,
+    description: "E SE o mercado só negociasse possibilidades? A corretora respondeu com um gráfico que sobe e desce ao mesmo tempo.",
+    consequence: "Cada ação recebe um cenário aleatório de alta ou queda entre 4% e 12%. Cenário puramente imaginário.",
+  },
+  {
+    id: "painho",
+    name: "PAINHO CUMPANHEIRO CONFISCA TUDO (DE MENTIRINHA)",
+    emoji: "🫳",
+    school: false,
+    duration: 8000,
+    description: "CARAI BORRACHA! O personagem fictício entrou na sala: 'ME DÁ TUDO, CUMPANHEIRO!' O sistema mostra R$ 0,00 por pegadinha.",
+    consequence: "Confisco 100% VISUAL por 8s; saldo, ações, cotações, XP e ranking ficam intactos. É só uma piada.",
+  },
+  {
+    id: "taxad",
+    name: "TAXAD CRIA O IMPOSTO DO IMPOSTO",
+    emoji: "🧾",
+    school: false,
+    duration: 9000,
+    description: "O ministro fictício da Receita Imaginária decidiu taxar até o espaço vazio entre dois cliques.",
+    consequence: "CLT4 cai 8%, BOLO4 cai 6% e FOFO3 sobe 7% com o vazamento do novo formulário.",
+  },
+  {
+    id: "cavaleiros", name: "REUNIÃO DOS 4 CAVALEIROS DO PREJUÍZO!", emoji: "🐎",
+    school: false, duration: 14000,
+    description: "SÁTIRA FICTÍCIA · Vorcaro apresenta o balanço em coxinhas. Bolsonaro Hipotético pergunta E SE? Painho pede tudo. Taxad anuncia a taxa de participação. Irineu: IRINEU, VOCÊ NÃO SABE NEM EU!",
+    consequence: "CARAI BORRACHA! ESSA REUNIÃO CUSTOU 3 TRILHÕES DE REAIS FICTÍCIOS! Só as cotações reagem: nenhum débito no caixa. POMBO3 e FOFO3 sobem; CLT4 e BOLO4 recuam.",
   },
 ];
 export const resenhaAchievements = [

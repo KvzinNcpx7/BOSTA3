@@ -1,3 +1,4 @@
+import { horsemenLines, horsemen } from "./horsemen";
 import type { Game } from "./engine";
 import {
   chatLines,
@@ -295,6 +296,21 @@ export function observeFun(g: Game, rng = Math.random, now = Date.now()): Game {
         rng,
         now,
       );
+    if (news?.special && news.special in horsemen) {
+      const speaker = news.special as keyof typeof horsemen;
+      const lines = horsemenLines.filter(([id]) => id === speaker);
+      const line = lines[Math.min(lines.length - 1, Math.floor(rng() * lines.length))];
+      f = appendChat(f, speaker, `SÁTIRA FICTÍCIA · ${line[1]}`, now);
+    }
+    if (news?.special === "cavaleiros") {
+      for (const [speaker, text] of [
+        ["vorcaro", "Balanço aprovado: 900 trilhões de coxinhas e um passivo de guardanapos."],
+        ["hipotetico", "E SE a ata fosse um áudio?"],
+        ["painho", "ME DÁ TUDO, CUMPANHEIRO! Até o microfone dessa reunião!"],
+        ["taxad", "Taxa de participação: um susto por CPF imaginário. Nenhum débito."],
+        ["irineu", "IRINEU, VOCÊ NÃO SABE NEM EU!"],
+      ] as const) f = appendChat(f, speaker, `SÁTIRA FICTÍCIA · ${text}`, now);
+    }
     f = { ...f, seenNews: key };
   }
   const crisis = g.news.slice(0, 2).find((n) => n.report && n.impact <= -0.12);
