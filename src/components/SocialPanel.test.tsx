@@ -167,3 +167,11 @@ describe("login e convite sem avisos antigos", () => {
     expect(m.shareScore).not.toHaveBeenCalled();
   });
 });
+it("oferece login na carreira sem consultar ou publicar ligas", async () => {
+ m.getSession.mockResolvedValue({data:{session},error:null});
+ render(<SocialPanel game={fresh()} notify={vi.fn()} accountOnly />);
+ await screen.findByText('conta@example.invalid');
+ expect(screen.getByText('Minha conta BOSTA3')).toBeTruthy();
+ expect(screen.queryByText('Publicar meu placar atual')).toBeNull();
+ expect(m.clubs).not.toHaveBeenCalled();expect(m.shareScore).not.toHaveBeenCalled();
+});

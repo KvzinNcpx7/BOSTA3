@@ -276,10 +276,8 @@ export function tick(
   });
 }
 export const SAVE_KEY = "bosta3-game-v1";
-export function loadGame(): Game {
+export function decodeGame(raw: string): Game | null {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return fresh();
     const g = JSON.parse(raw);
     if (
       (g.version !== 1 && g.version !== 2) ||
@@ -317,7 +315,7 @@ export function loadGame(): Game {
       !Number.isInteger(g.trades) ||
       !Number.isFinite(g.realized)
     )
-      return fresh();
+      return null;
     const base = freshCareer();
     const career = g.version === 2 ? g.career : base;
     if (
@@ -354,7 +352,7 @@ export function loadGame(): Game {
           Number.isSafeInteger(r.quantity),
       )
     )
-      return fresh();
+      return null;
     const migrated: Game = {
       ...g,
       version: 2,
@@ -363,6 +361,11 @@ export function loadGame(): Game {
     };
     return { ...migrated, fun: restoreFun(g.fun, migrated) };
   } catch {
-    return fresh();
+    return null;
   }
+}
+
+export function loadGame(): Game {
+  try { return decodeGame(localStorage.getItem(SAVE_KEY) || "") || fresh(); }
+  catch { return fresh(); }
 }
